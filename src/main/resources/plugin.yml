@@ -1,0 +1,10 @@
+name: MyColony
+version: '${project.version}'
+main: ru.mcfine.mycolony.mycolony.MyColony
+api-version: 1.19
+load: STARTUP
+commands:
+  mycolony:
+    description: main command
+    usage: just use it lol
+
