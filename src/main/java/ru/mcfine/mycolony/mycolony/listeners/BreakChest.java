@@ -14,7 +14,10 @@ public class BreakChest implements Listener {
     @EventHandler
     public void onBreakChest(BlockBreakEvent event){
         if(event.getBlock().getType() != Material.CHEST) return;
-        if(!MyColony.regionManager.isRegionBlock(event.getBlock())) return;
+        if(!MyColony.regionManager.isRegionBlock(event.getBlock())){
+            System.out.println("Not region block");
+            return;
+        }
         MyColony.regionManager.removeRegion(event.getBlock().getLocation());
         System.out.println("Region removed");
     }

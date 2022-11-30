@@ -1,1 +1,16 @@
 name: "townhall_1"
+xRight: 3
+xLeft: 3
+zForward: 3
+zBackward: 3
+yUp: 3
+yDown: 3
+level: 1
+production:
+  iron_ingot: 10
+consumables:
+  iron_ore: 10
+building-materials:
+  primary: 10
+  secondary: 10
+  cobblestone: 10

@@ -1,5 +1,6 @@
 package ru.mcfine.mycolony.mycolony.listeners;
 
+import com.github.stefvanschie.inventoryframework.gui.type.ChestGui;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
 import org.bukkit.event.EventHandler;
@@ -9,6 +10,7 @@ import ru.mcfine.mycolony.mycolony.MyColony;
 import ru.mcfine.mycolony.mycolony.regions.Region;
 import ru.mcfine.mycolony.mycolony.regions.RegionGUI;
 import ru.mcfine.mycolony.mycolony.regions.RegionManager;
+import ru.mcfine.mycolony.mycolony.tasks.TickerRunnable;
 
 public class OpenChest implements Listener {
 
@@ -19,6 +21,8 @@ public class OpenChest implements Listener {
         Region region = MyColony.regionManager.getRegion(block.getLocation());
         if(region == null) return;
         event.setCancelled(true);
-        RegionGUI.getHomeGui(region, event.getInventory()).show(event.getPlayer());
+        ChestGui gui = RegionGUI.getHomeGui(region, block);
+        TickerRunnable.guis.put(event.getPlayer().getName(), gui);
+        gui.show(event.getPlayer());
     }
 }
