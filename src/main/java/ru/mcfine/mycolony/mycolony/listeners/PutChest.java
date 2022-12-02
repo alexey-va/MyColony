@@ -11,35 +11,50 @@ import org.bukkit.event.block.BlockPlaceEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.persistence.PersistentDataType;
+import org.bukkit.scheduler.BukkitRunnable;
 import ru.mcfine.mycolony.mycolony.MyColony;
+import ru.mcfine.mycolony.mycolony.regions.BuildGui;
 import ru.mcfine.mycolony.mycolony.regions.BuildingMaterial;
 import ru.mcfine.mycolony.mycolony.regions.Region;
 import ru.mcfine.mycolony.mycolony.regions.RegionManager;
 
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
 
 public class PutChest implements Listener {
 
     @EventHandler
-    public void onPutChest(BlockPlaceEvent event){
-        if(event.getBlockPlaced().getType() != Material.CHEST) return;
+    public void onPutChest(BlockPlaceEvent event) {
+        if (event.getBlockPlaced().getType() != Material.CHEST) return;
 
         ItemStack chest = event.getItemInHand();
         ItemMeta meta = chest.getItemMeta();
         NamespacedKey regionKey = new NamespacedKey(MyColony.plugin, "region_name");
         String regionName = meta.getPersistentDataContainer().get(regionKey, PersistentDataType.STRING);
-        if(regionName == null) return;
+        if (regionName == null) return;
 
         Block block = event.getBlockPlaced();
-        HashMap<BuildingMaterial, Integer> mats = BuildingMaterial.locationSatisfyBlocks(block.getLocation(), ((Directional)block.getBlockData()).getFacing(), MyColony.plugin.config.getRegionType(regionName));
+        List<BuildingMaterial> mats = BuildingMaterial.locationSatisfyBlocks(block.getLocation(), ((Directional) block.getBlockData()).getFacing(), MyColony.plugin.config.getRegionType(regionName));
 
-        for(Map.Entry<BuildingMaterial, Integer> entry : mats.entrySet()){
-            System.out.println(entry.getKey() + " | "+entry.getValue());
+        System.out.println(mats.size());
+
+        if(mats.size() > 0){
+            BuildGui gui = new BuildGui(mats);
+            gui.show(event.getPlayer());
+            event.setCancelled(true);
+        } else {
+
+            ArrayList<String> playerNames = (ArrayList<String>) List.of(event.getPlayer().getName());
+            ArrayList<String> playerUUIDs = (ArrayList<String>) List.of(event.getPlayer().getUniqueId().toString());
+            Region region = new Region(playerNames, 0, block.getX(), block.getY(), block.getZ(),
+                    regionName, block.getWorld().getName(), playerUUIDs, MyColony.plugin.config.getRegionType(regionName), null);
+            MyColony.regionManager.addRegion(block.getLocation(), region);
+
+            new BukkitRunnable() {
+                @Override
+                public void run() {
+                    MyColony.plugin.getJsonStorage().saveDataSync();
+                }
+            }.runTaskAsynchronously(MyColony.plugin);
         }
-
-        Region region = new Region(event.getPlayer().getName(), 0, block.getX(), block.getY(), block.getZ(),
-                regionName, block.getWorld().getName(), event.getPlayer().getUniqueId().toString(), MyColony.plugin.config.getRegionType(regionName));
-        MyColony.regionManager.addRegion(block.getLocation(), region);
     }
 }

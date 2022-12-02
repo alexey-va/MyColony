@@ -2,12 +2,11 @@ package ru.mcfine.mycolony.mycolony.util;
 
 import com.google.common.reflect.TypeToken;
 import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
 import ru.mcfine.mycolony.mycolony.MyColony;
 import ru.mcfine.mycolony.mycolony.regions.RegionMock;
 
-import java.io.File;
-import java.io.FileReader;
-import java.io.Reader;
+import java.io.*;
 import java.lang.reflect.Type;
 import java.util.ArrayList;
 
@@ -36,6 +35,40 @@ public class JsonStorage {
         } catch (Exception ex){
             ex.printStackTrace();
         }
+    }
+
+    public void saveDataSync() {
+
+        Gson gson = new GsonBuilder().setPrettyPrinting().create();
+        File file = new File(MyColony.plugin.getDataFolder().getAbsolutePath() + File.separator + "storage" + File.separator + "regions.json");
+        //noinspection ResultOfMethodCallIgnored
+        file.getParentFile().mkdirs();
+        try {
+            //noinspection ResultOfMethodCallIgnored
+            file.createNewFile();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        Writer writer;
+        try {
+            writer = new FileWriter(file, false);
+        } catch (IOException e) {
+            e.printStackTrace();
+            return;
+        }
+
+        gson.toJson(MyColony.regionManager.getRegionsMock(), writer);
+        try {
+            writer.flush();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        try {
+            writer.close();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
     }
 
 }

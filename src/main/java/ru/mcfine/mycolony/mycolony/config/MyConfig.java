@@ -62,7 +62,7 @@ public class MyConfig {
 
             InputStream inputStream = new FileInputStream(file);
             HashMap<String, Object> data = yaml.load(inputStream);
-            System.out.println(data);
+            //System.out.println(data);
 
             //Double income = (Double) data.get("income");
             //Integer level = (Integer) data.get("level");
@@ -114,7 +114,7 @@ public class MyConfig {
             Object object2 = data.get("production");
             if(object != null) {
                 try {
-                    HashMap<String, Integer> productionMap = (HashMap<String, Integer>) object;
+                    HashMap<String, Integer> productionMap = (HashMap<String, Integer>) object2;
                     productionList = new ArrayList<>();
                     for (Map.Entry<String, Integer> entry : productionMap.entrySet()) {
                         try {
@@ -150,6 +150,7 @@ public class MyConfig {
                     level, 1, 0, null, matList,
                     xRight, xLeft, zBackward, zForward, yDown, yUp);
 
+            System.out.println(name+" | "+regionType);
             regionTypes.put(name, regionType);
             
 
@@ -169,7 +170,7 @@ public class MyConfig {
                 for (String s : groupString.split(",")) {
                     try {
                         materials.add(Material.matchMaterial(s));
-                        System.out.println(groupName+" | "+Material.matchMaterial(s));
+                        //System.out.println(groupName+" | "+Material.matchMaterial(s));
                     } catch (Exception ex) {
                         ex.printStackTrace();
                     }

@@ -27,13 +27,17 @@ public class BuildingMaterial {
         this.amount = amount;
     }
 
+    public BuildingMaterial(BuildingMaterial mat){
+        this.material = mat.getMaterial();
+        this.amount = mat.getAmount();
+        this.groupName = mat.getGroupName();
+    }
+
     public int materialSatisfy(List<Block> blocks) {
         int counter = 0;
-        System.out.println(groupName + " | "+material);
         if(this.groupName != null && this.material == null){
             HashSet<Material> materials = MyColony.plugin.config.getMaterialGroup(groupName);
             for(Block block : blocks){
-                System.out.println(block.getType()+" | "+counter);
                 if(materials.contains(block.getType())) counter++;
                 if(counter >= amount) return 0;
             }
@@ -49,8 +53,8 @@ public class BuildingMaterial {
         return (amount - counter);
     }
 
-    public static HashMap<BuildingMaterial, Integer> locationSatisfyBlocks(Location location, BlockFace blockFace, RegionType regionType){
-        HashMap<BuildingMaterial, Integer> result = new HashMap<>();
+    public static List<BuildingMaterial> locationSatisfyBlocks(Location location, BlockFace blockFace, RegionType regionType){
+        List<BuildingMaterial> result = new ArrayList<>();
         int xCorner = location.getBlockX();
         int yCorner = location.getBlockY();
         int zCorner = location.getBlockZ();
@@ -106,7 +110,7 @@ public class BuildingMaterial {
             xCorner = temp;
         }
         List<Block> blocks = new ArrayList<>();
-        System.out.println(xCorner+" | "+yCorner+" | "+zCorner+" | "+xCorner2+" | "+yCorner2+" | "+zCorner2);
+
 
         for(int x = xCorner; x<= xCorner2; x++){
             for(int y = yCorner; y<=yCorner2; y++){
@@ -117,12 +121,37 @@ public class BuildingMaterial {
         }
 
         for(BuildingMaterial buildingMaterial : regionType.getBuildingMaterials()){
-            result.put(buildingMaterial, buildingMaterial.materialSatisfy(blocks));
+            BuildingMaterial bm = new BuildingMaterial(buildingMaterial);
+            bm.setAmount(buildingMaterial.materialSatisfy(blocks));
+            result.add(bm);
         }
 
         return result;
     }
 
 
+    public String getGroupName() {
+        return groupName;
+    }
+
+    public int getAmount() {
+        return amount;
+    }
+
+    public Material getMaterial() {
+        return material;
+    }
+
+    public void setGroupName(String groupName) {
+        this.groupName = groupName;
+    }
+
+    public void setAmount(int amount) {
+        this.amount = amount;
+    }
+
+    public void setMaterial(Material material) {
+        this.material = material;
+    }
 }
 

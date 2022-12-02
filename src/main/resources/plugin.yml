@@ -2,7 +2,8 @@ name: MyColony
 version: '${project.version}'
 main: ru.mcfine.mycolony.mycolony.MyColony
 api-version: 1.19
-load: STARTUP
+load: POSTWORLD
+softdepend: [ChestSort]
 commands:
   mycolony:
     description: main command

@@ -9,13 +9,14 @@ import org.bukkit.World;
 import org.bukkit.block.Block;
 import org.bukkit.persistence.PersistentDataType;
 import ru.mcfine.mycolony.mycolony.MyColony;
+import ru.mcfine.mycolony.mycolony.config.MyConfig;
+import ru.mcfine.mycolony.mycolony.util.JsonStorage;
 
 import java.util.ArrayList;
 import java.util.HashMap;
 
 public class RegionManager {
 
-    private HashMap<String, RegionType> regionTypes = new HashMap<>();
 
     private HashMap<Chunk, HashMap<Location,Region>> regionMap = new HashMap<>();
 
@@ -24,12 +25,6 @@ public class RegionManager {
     }
 
     public RegionManager(){
-
-        //RegionType regionType = new RegionType();
-        for(World world : MyColony.plugin.getServer().getWorlds()){
-
-        }
-
     }
 
     public HashMap<Location, Region> getRegions(Chunk chunk){
@@ -54,7 +49,7 @@ public class RegionManager {
 
         CustomBlockData container = new CustomBlockData(location.getBlock(), MyColony.plugin);
         container.set(new NamespacedKey(MyColony.plugin, "region_name"), PersistentDataType.STRING, region.getRegionName());
-        container.set(new NamespacedKey(MyColony.plugin, "region_owner_name"), PersistentDataType.STRING, region.getPlayerName());
+        container.set(new NamespacedKey(MyColony.plugin, "region_id"), PersistentDataType.STRING, region.getUuid());
     }
 
     public void removeRegion(Location location){
@@ -80,6 +75,11 @@ public class RegionManager {
 
     public void uploadRegions(ArrayList<RegionMock> fromJson) {
         HashMap<Chunk, HashMap<Location,Region>> regions = new HashMap<>();
+        System.out.println("Uploading regions");
+        if(fromJson == null){
+            this.regionMap = regions;
+            return;
+        }
         for(RegionMock regionMock : fromJson){
             World world = MyColony.plugin.getServer().getWorld(regionMock.worldName);
             if(world == null){
@@ -88,14 +88,17 @@ public class RegionManager {
             }
             Location location = new Location(world, regionMock.x, regionMock.y, regionMock.z);
             Chunk chunk = location.getChunk();
-            RegionType regionType = regionTypes.get(regionMock.regionName);
+            RegionType regionType = MyColony.plugin.config.getRegionType(regionMock.regionName);
+            System.out.println(regionMock.regionName);
+
             if(regionType == null){
                 MyColony.plugin.getLogger().severe("Region type "+regionMock.regionName+" not found!");
                 continue;
             }
 
-            Region region = new Region(regionMock.playerName, regionMock.level, regionMock.x, regionMock.y, regionMock.z,
-                    regionMock.regionName, regionMock.worldName, regionMock.playerUUID, regionType);
+            Region region = new Region(regionMock.playerNames, regionMock.level, regionMock.x, regionMock.y, regionMock.z,
+                    regionMock.regionName, regionMock.worldName, regionMock.playerUUIDs, regionType, regionMock.uuid);
+            System.out.println(region);
             HashMap<Location, Region> temp = null;
             if(regions.get(chunk) == null){
                 temp = new HashMap<>();
@@ -105,7 +108,20 @@ public class RegionManager {
                 temp.put(location, region);
             }
             regions.put(chunk, temp);
-        }
 
+        }
+        this.regionMap = regions;
+
+    }
+
+    public ArrayList<RegionMock> getRegionsMock(){
+        ArrayList<RegionMock> mockList = new ArrayList<>();
+        for(HashMap<Location, Region> temp : regionMap.values()){
+            for(Region region : temp.values()){
+                RegionMock mock = new RegionMock(region);
+                mockList.add(mock);
+            }
+        }
+        return mockList;
     }
 }

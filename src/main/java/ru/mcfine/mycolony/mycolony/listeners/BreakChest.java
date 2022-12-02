@@ -5,6 +5,7 @@ import org.bukkit.Material;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.BlockBreakEvent;
+import org.bukkit.scheduler.BukkitRunnable;
 import ru.mcfine.mycolony.mycolony.MyColony;
 
 import java.util.List;
@@ -20,6 +21,13 @@ public class BreakChest implements Listener {
         }
         MyColony.regionManager.removeRegion(event.getBlock().getLocation());
         System.out.println("Region removed");
+
+        new BukkitRunnable() {
+            @Override
+            public void run() {
+                MyColony.plugin.getJsonStorage().saveDataSync();
+            }
+        }.runTaskAsynchronously(MyColony.plugin);
     }
 
 }
