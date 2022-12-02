@@ -41,7 +41,7 @@ public class GroupItem {
             meta.displayName(Lang.get("groups." + groupName + "-display-name"));
             itemStack.setItemMeta(meta);
             this.guiItem = new GuiItem(itemStack, event -> {
-                MaterialGroupGui materialGroupGui = new MaterialGroupGui(MyColony.plugin.config.getMaterialGroup(groupName), this.parent);
+                MaterialGroupGui materialGroupGui = new MaterialGroupGui(groupName, this.parent);
                 materialGroupGui.show(event.getWhoClicked());
             });
         }
@@ -49,18 +49,15 @@ public class GroupItem {
 
     }
 
-    public GuiItem getNext() {
-        if (matGroup == null) return guiItem;
-        int nextId = currentId;
-        if (matGroup.size() > 1) currentId = (currentId + 1) / (matGroup.size() - 1);
-        Material material = matGroup.get(nextId);
-        itemStack.setType(material);
-        this.guiItem = new GuiItem(itemStack, event -> {
-            MaterialGroupGui materialGroupGui = new MaterialGroupGui(MyColony.plugin.config.getMaterialGroup(groupName), this.parent);
-            materialGroupGui.show(event.getWhoClicked());
-        });
+    public void setNext() {
+        if (matGroup == null) return;
 
-        return this.guiItem;
+        int nextId = currentId;
+        if (matGroup.size() > 1) nextId = (currentId + 1) % (matGroup.size() - 1);
+        currentId = nextId;
+
+        Material material = matGroup.get(nextId);
+        this.guiItem.getItem().setType(material);
     }
 
     public GuiItem getGuiItem() {

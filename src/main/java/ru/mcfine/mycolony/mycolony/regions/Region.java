@@ -58,9 +58,11 @@ public class Region {
     public void incrementTime(double inc)
     {
         this.timeElapsed += inc;
-        if(this.timeElapsed > maxTime){
+        if(this.timeElapsed > maxTime - inc && this.timeElapsed <= maxTime){
+            if(MyColony.plugin.chestSortAPI) ChestSortAPI.sortInventory(((Chest) location.getBlock().getState()).getInventory());
+            System.out.println("Sorting...");
+        }else if(this.timeElapsed > maxTime){
             this.timeElapsed = 0;
-            Chest chest = (Chest) location.getBlock().getState();
             if(this.regionType.getProductionList() != null){
                 Pair<Boolean, ArrayList<ConsumableType>> slotsAndConsumables = ifHasMaterials();
                 if(slotsAndConsumables == null) return;
@@ -166,7 +168,6 @@ public class Region {
         if(productList == null) productList = new ArrayList<>();
 
         Inventory inventory = ((Chest)location.getBlock().getState()).getInventory();
-        if(MyColony.plugin.chestSortAPI) ChestSortAPI.sortInventory(inventory);
 
         HashMap<Material, Integer> needs = new HashMap<>();
         for(ConsumableType consumableType : consumables){

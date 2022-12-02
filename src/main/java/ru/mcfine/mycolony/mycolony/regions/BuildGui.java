@@ -10,6 +10,7 @@ import ru.mcfine.mycolony.mycolony.config.Lang;
 import ru.mcfine.mycolony.mycolony.util.Utils;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 
 public class BuildGui extends ChestGui {
@@ -17,8 +18,8 @@ public class BuildGui extends ChestGui {
     int wPadding = 2;
     int vPadding = 2;
     public PaginatedPane materialPane = null;
-    private ArrayList<Pair<GroupItem, Integer>> groupItems = new ArrayList<>();
-    public static ArrayList<BuildGui> buildGuis = new ArrayList<>();
+    private ArrayList<GroupItem> groupItems = new ArrayList<>();
+    public static HashSet<BuildGui> buildGuis = new HashSet<>();
 
     public BuildGui(List<BuildingMaterial> mats) {
         super(6, Lang.getString("menu.not-enough-materials"));
@@ -43,7 +44,7 @@ public class BuildGui extends ChestGui {
             int amount = material.getAmount();
             while(amount > 0){
                 GroupItem groupItem = new GroupItem(material, Math.min(64, material.getAmount()), this);
-                groupItems.add(new Pair<>(groupItem, id));
+                groupItems.add(groupItem);
                 guiItems.add(groupItem.getGuiItem());
                 id++;
                 amount-=64;
@@ -75,7 +76,7 @@ public class BuildGui extends ChestGui {
         return (int)(Math.ceil(slots/(9.0-wPadding)))+vPadding;
     }
 
-    public ArrayList<Pair<GroupItem, Integer>> getGroupItems() {
+    public ArrayList<GroupItem> getGroupItems() {
         return groupItems;
     }
 }

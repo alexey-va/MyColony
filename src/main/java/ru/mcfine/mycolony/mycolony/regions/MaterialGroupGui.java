@@ -10,6 +10,8 @@ import javafx.util.Pair;
 import org.bukkit.Material;
 import org.bukkit.inventory.ItemStack;
 import org.jetbrains.annotations.NotNull;
+import ru.mcfine.mycolony.mycolony.MyColony;
+import ru.mcfine.mycolony.mycolony.config.Lang;
 import ru.mcfine.mycolony.mycolony.util.Utils;
 
 import java.util.ArrayList;
@@ -23,13 +25,14 @@ public class MaterialGroupGui extends ChestGui {
     int wPadding = 2;
     BuildGui parent;
 
-    public MaterialGroupGui(HashSet<Material> mats, BuildGui parent) {
-        super(6, " ");
+    public MaterialGroupGui(String groupName, BuildGui parent) {
+        super(6, Lang.getString("groups." + groupName + "-display-name"));
+
+        HashSet<Material> mats = MyColony.plugin.config.getMaterialGroup(groupName);
 
         this.parent = parent;
 
-        int rows = mats.size();
-        int pages = (int) Math.ceil(rows / (6.0 - vPadding));
+        int rows = Math.min(6, (int)(Math.ceil(mats.size()/(9.0-wPadding) ) ) );
         this.setRows(rows);
 
         OutlinePane background = new OutlinePane(0, 0, 9, rows, Pane.Priority.LOWEST);
@@ -40,7 +43,7 @@ public class MaterialGroupGui extends ChestGui {
         background.setRepeat(true);
         this.addPane(background);
 
-        PaginatedPane materialPane = new PaginatedPane(wPadding / 2, vPadding / 2, 9 - wPadding, 9 - vPadding, Pane.Priority.NORMAL);
+        PaginatedPane materialPane = new PaginatedPane(wPadding / 2, vPadding / 2, 9 - wPadding, rows - vPadding, Pane.Priority.NORMAL);
         List<ItemStack> itemStacks = new ArrayList<>();
         for (Material material : mats) {
             itemStacks.add(new ItemStack(material, 1));
@@ -54,17 +57,23 @@ public class MaterialGroupGui extends ChestGui {
 
         StaticPane navigation = new StaticPane(0, rows - 1, 9, 1);
 
-        GuiItem prevPage = new GuiItem(new ItemStack(Material.GREEN_WOOL, 1), event -> {
-            System.out.println(materialPane.getPage() +" | page");
-            if(materialPane.getPage() > 0) materialPane.setPage(materialPane.getPage() - 1);
-            else parent.show(event.getWhoClicked());
-            this.update();
+        GuiItem prevPage = new GuiItem(new ItemStack(Material.RED_WOOL), event -> {
+            //System.out.println(materialPane.getPage() +" | page");
+            if(materialPane.getPage() > 0){
+                materialPane.setPage(materialPane.getPage() - 1);
+                this.update();
+            }
+            else{
+                parent.show(event.getWhoClicked());
+                BuildGui.buildGuis.add(parent);
+            }
         });
         navigation.addItem(prevPage, 0, 0);
 
         GuiItem nextPage = new GuiItem(new ItemStack(Material.GREEN_WOOL), event -> {
-            if (materialPane.getPage() < materialPane.getPages()) materialPane.setPage(materialPane.getPage() + 1);
-            else materialPane.setPage(1);
+            if (materialPane.getPage() < materialPane.getPages() - 1) materialPane.setPage(materialPane.getPage() + 1);
+            else materialPane.setPage(0);
+            this.update();
         });
         navigation.addItem(nextPage, 8, 0);
 

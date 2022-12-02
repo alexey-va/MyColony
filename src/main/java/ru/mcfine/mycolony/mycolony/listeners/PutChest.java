@@ -13,10 +13,12 @@ import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.persistence.PersistentDataType;
 import org.bukkit.scheduler.BukkitRunnable;
 import ru.mcfine.mycolony.mycolony.MyColony;
+import ru.mcfine.mycolony.mycolony.config.Lang;
 import ru.mcfine.mycolony.mycolony.regions.BuildGui;
 import ru.mcfine.mycolony.mycolony.regions.BuildingMaterial;
 import ru.mcfine.mycolony.mycolony.regions.Region;
 import ru.mcfine.mycolony.mycolony.regions.RegionManager;
+import ru.mcfine.mycolony.mycolony.util.Utils;
 
 import java.util.*;
 
@@ -33,18 +35,19 @@ public class PutChest implements Listener {
         if (regionName == null) return;
 
         Block block = event.getBlockPlaced();
-        List<BuildingMaterial> mats = BuildingMaterial.locationSatisfyBlocks(block.getLocation(), ((Directional) block.getBlockData()).getFacing(), MyColony.plugin.config.getRegionType(regionName));
-
-        System.out.println(mats.size());
+        List<BuildingMaterial> mats = Utils.locationSatisfyBlocks(block.getLocation(), ((Directional) block.getBlockData()).getFacing(), MyColony.plugin.config.getRegionType(regionName));
+        Utils.showOutliner(block.getLocation(), ((Directional) block.getBlockData()).getFacing(), MyColony.plugin.config.getRegionType(regionName), event.getPlayer());
 
         if(mats.size() > 0){
             BuildGui gui = new BuildGui(mats);
             gui.show(event.getPlayer());
             event.setCancelled(true);
         } else {
+            ArrayList<String> playerNames = new ArrayList<>();
+            ArrayList<String> playerUUIDs = new ArrayList<>();
+            playerNames.add(event.getPlayer().getName());
+            playerUUIDs.add(event.getPlayer().getUniqueId().toString());
 
-            ArrayList<String> playerNames = (ArrayList<String>) List.of(event.getPlayer().getName());
-            ArrayList<String> playerUUIDs = (ArrayList<String>) List.of(event.getPlayer().getUniqueId().toString());
             Region region = new Region(playerNames, 0, block.getX(), block.getY(), block.getZ(),
                     regionName, block.getWorld().getName(), playerUUIDs, MyColony.plugin.config.getRegionType(regionName), null);
             MyColony.regionManager.addRegion(block.getLocation(), region);
@@ -55,6 +58,8 @@ public class PutChest implements Listener {
                     MyColony.plugin.getJsonStorage().saveDataSync();
                 }
             }.runTaskAsynchronously(MyColony.plugin);
+
+            event.getPlayer().sendMessage(Lang.get("region.region-placed"));
         }
     }
 }
