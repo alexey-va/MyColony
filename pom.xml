@@ -83,9 +83,19 @@
             <id>jeff-media-public</id>
             <url>https://hub.jeff-media.com/nexus/repository/jeff-media-public/</url>
         </repository>
+        <repository>
+            <id>jitpack.io</id>
+            <url>https://jitpack.io</url>
+        </repository>
     </repositories>
 
     <dependencies>
+        <dependency>
+            <groupId>com.github.angeschossen</groupId>
+            <artifactId>LandsAPI</artifactId>
+            <version>6.22.0</version>
+            <scope>provided</scope>
+        </dependency>
         <dependency>
             <groupId>de.jeff_media</groupId>
             <artifactId>ChestSortAPI</artifactId>

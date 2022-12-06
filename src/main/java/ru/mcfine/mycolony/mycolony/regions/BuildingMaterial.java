@@ -5,6 +5,7 @@ import org.bukkit.Material;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
 import ru.mcfine.mycolony.mycolony.MyColony;
+import ru.mcfine.mycolony.mycolony.config.MyConfig;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -36,7 +37,7 @@ public class BuildingMaterial {
     public int materialSatisfy(List<Block> blocks) {
         int counter = 0;
         if(this.groupName != null && this.material == null){
-            HashSet<Material> materials = MyColony.plugin.config.getMaterialGroup(groupName);
+            HashSet<Material> materials = MyConfig.getMaterialGroup(groupName);
             for(Block block : blocks){
                 if(materials.contains(block.getType())) counter++;
                 if(counter >= amount) return 0;

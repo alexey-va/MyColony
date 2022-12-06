@@ -9,6 +9,7 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import ru.mcfine.mycolony.mycolony.MyColony;
 import ru.mcfine.mycolony.mycolony.config.Lang;
+import ru.mcfine.mycolony.mycolony.config.MyConfig;
 
 import java.util.HashSet;
 import java.util.List;
@@ -34,7 +35,7 @@ public class GroupItem {
             });
         } else {
             isGroup = true;
-            matGroup = MyColony.plugin.config.getMaterialGroup(groupName).stream().toList();
+            matGroup = MyConfig.getMaterialGroup(groupName).stream().toList();
             Material material = matGroup.get(0);
             itemStack = new ItemStack(material, amount);
             ItemMeta meta = itemStack.getItemMeta();

@@ -1,6 +1,12 @@
 package ru.mcfine.mycolony.mycolony.regions;
 
+import org.bukkit.Location;
+import ru.mcfine.mycolony.mycolony.city.CityArea;
+import ru.mcfine.mycolony.mycolony.city.CityRegion;
+import ru.mcfine.mycolony.mycolony.city.SquareArea;
+
 import java.util.ArrayList;
+import java.util.List;
 
 public class RegionMock {
     public ArrayList<String> playerNames;
@@ -12,6 +18,14 @@ public class RegionMock {
     public double timeElapsed;
     public double totalIncome;
     public String uuid;
+    public double bankDeposit;
+
+    /// AREA
+    public int chunkRadius = -1;
+
+    // CITY
+    public int population;
+    public List<String> members;
 
     public RegionMock(Region region){
         this.playerNames = region.getPlayerNames();
@@ -25,5 +39,14 @@ public class RegionMock {
         this.timeElapsed = region.getTimeElapsed();
         this.totalIncome = region.getTotalIncome();
         this.uuid = region.getUuid();
+        this.bankDeposit = region.getBankDeposit();
+        if(region instanceof CityRegion cityRegion){
+            if(cityRegion.getCityArea() instanceof SquareArea squareArea){
+                this.chunkRadius = squareArea.getChunkRadius();
+            }
+
+            this.members = cityRegion.getCityMembers();
+            this.population = cityRegion.getCityPopulation();
+        }
     }
 }

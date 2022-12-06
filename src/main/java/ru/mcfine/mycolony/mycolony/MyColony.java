@@ -6,6 +6,7 @@ import org.bukkit.plugin.PluginManager;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.scheduler.BukkitTask;
 import org.jetbrains.annotations.NotNull;
+import ru.mcfine.mycolony.mycolony.city.LandsAPIHook;
 import ru.mcfine.mycolony.mycolony.commands.GetRegion;
 import ru.mcfine.mycolony.mycolony.config.MyConfig;
 import ru.mcfine.mycolony.mycolony.listeners.BreakChest;
@@ -24,6 +25,7 @@ public final class MyColony extends JavaPlugin {
     public MyConfig config;
     private JsonStorage jsonStorage;
     public boolean chestSortAPI = false;
+    public LandsAPIHook landsHook = null;
 
     @Override
     public void onEnable() {
@@ -43,6 +45,9 @@ public final class MyColony extends JavaPlugin {
 
         if(Bukkit.getPluginManager().getPlugin("ChestSort") != null){
             this.chestSortAPI = true;
+        }
+        if(Bukkit.getPluginManager().getPlugin("Lands") != null){
+            this.landsHook  = new LandsAPIHook();
         }
     }
 

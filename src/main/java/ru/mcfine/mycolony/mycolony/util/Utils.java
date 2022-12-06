@@ -3,6 +3,7 @@ package ru.mcfine.mycolony.mycolony.util;
 import javafx.util.Pair;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.minimessage.MiniMessage;
+import org.bukkit.Chunk;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.World;
@@ -16,33 +17,31 @@ import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.scheduler.BukkitTask;
 import org.bukkit.util.Vector;
 import ru.mcfine.mycolony.mycolony.MyColony;
-import ru.mcfine.mycolony.mycolony.config.MyConfig;
 import ru.mcfine.mycolony.mycolony.regions.BuildingMaterial;
+import ru.mcfine.mycolony.mycolony.regions.Region;
 import ru.mcfine.mycolony.mycolony.regions.RegionType;
 import xyz.xenondevs.particle.ParticleBuilder;
 import xyz.xenondevs.particle.ParticleEffect;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
+import java.util.*;
 
 public class Utils {
 
     private static MiniMessage mm = MiniMessage.miniMessage();
-    private static HashMap<Player, BukkitTask> bukkitTasks = new HashMap<>();
-
-    public static ItemStack getBackground(){
+    private static HashMap<Player, BukkitTask> showRegionTasks = new HashMap<>();
+    private static HashMap<Player, BukkitTask> showBlockingRegionTasks = new HashMap<>();
+    public static ItemStack getBackground() {
         ConfigurationSection section = MyColony.plugin.getConfig().getConfigurationSection("background-item");
         Material material = null;
         Component displayName = Component.text(" ");
         int modelData = 0;
-        if(section != null) {
+        if (section != null) {
             material = Material.matchMaterial(section.getString("material", "BLACK_STAINED_GLASS_PANE"));
             displayName = mm.deserialize(section.getString("display-name", " "));
             modelData = section.getInt("model-data", 0);
         }
 
-        if(material == null) material = Material.BLACK_STAINED_GLASS_PANE;
+        if (material == null) material = Material.BLACK_STAINED_GLASS_PANE;
 
         ItemStack bg = new ItemStack(material, 1);
         ItemMeta meta = bg.getItemMeta();
@@ -53,7 +52,7 @@ public class Utils {
         return bg;
     }
 
-    public static Pair<Location, Location> getRegionCorners(Location location, BlockFace blockFace, RegionType regionType){
+    public static Pair<Location, Location> getRegionCorners(Location location, BlockFace blockFace, RegionType regionType) {
         int xCorner = location.getBlockX();
         int yCorner = location.getBlockY();
         int zCorner = location.getBlockZ();
@@ -61,53 +60,53 @@ public class Utils {
         int xCorner2 = location.getBlockX();
         int yCorner2 = location.getBlockY();
         int zCorner2 = location.getBlockZ();
-        if(blockFace == BlockFace.WEST){
-            zCorner+= regionType.getxRight();
-            zCorner2-= regionType.getxLeft();
+        if (blockFace == BlockFace.WEST) {
+            zCorner += regionType.getxRight();
+            zCorner2 -= regionType.getxLeft();
 
-            xCorner-=regionType.getzForward();
-            xCorner2+=regionType.getzBackward();
+            xCorner -= regionType.getzForward();
+            xCorner2 += regionType.getzBackward();
 
-            yCorner-=regionType.getyUp();
-            yCorner2+=regionType.getyDown();
+            yCorner -= regionType.getyUp();
+            yCorner2 += regionType.getyDown();
         } else if (blockFace == BlockFace.NORTH) {
-            zCorner-= regionType.getzForward();
-            zCorner2+= regionType.getzBackward();
+            zCorner -= regionType.getzForward();
+            zCorner2 += regionType.getzBackward();
 
-            xCorner-=regionType.getxRight();
-            xCorner2+=regionType.getxLeft();
+            xCorner -= regionType.getxRight();
+            xCorner2 += regionType.getxLeft();
 
-            yCorner-=regionType.getyUp();
-            yCorner2+=regionType.getyDown();
-        } else if(blockFace == BlockFace.EAST){
-            zCorner-= regionType.getxRight();
-            zCorner2+= regionType.getxLeft();
+            yCorner -= regionType.getyUp();
+            yCorner2 += regionType.getyDown();
+        } else if (blockFace == BlockFace.EAST) {
+            zCorner -= regionType.getxRight();
+            zCorner2 += regionType.getxLeft();
 
-            xCorner+=regionType.getzForward();
-            xCorner2-=regionType.getzBackward();
+            xCorner += regionType.getzForward();
+            xCorner2 -= regionType.getzBackward();
 
-            yCorner-=regionType.getyUp();
-            yCorner2+=regionType.getyDown();
+            yCorner -= regionType.getyUp();
+            yCorner2 += regionType.getyDown();
         } else if (blockFace == BlockFace.SOUTH) {
-            zCorner+= regionType.getzForward();
-            zCorner2-= regionType.getzBackward();
+            zCorner += regionType.getzForward();
+            zCorner2 -= regionType.getzBackward();
 
-            xCorner+=regionType.getxRight();
-            xCorner2-=regionType.getxLeft();
+            xCorner += regionType.getxRight();
+            xCorner2 -= regionType.getxLeft();
 
-            yCorner-=regionType.getyUp();
-            yCorner2+=regionType.getyDown();
+            yCorner -= regionType.getyUp();
+            yCorner2 += regionType.getyDown();
         }
 
         //z1 always <= z2
-        if(zCorner > zCorner2){
+        if (zCorner > zCorner2) {
             int temp = zCorner2;
             zCorner2 = zCorner;
             zCorner = temp;
         }
 
-        //x2 always <= x2
-        if(xCorner > xCorner2){
+        //x1 always <= x2
+        if (xCorner > xCorner2) {
             int temp = xCorner2;
             xCorner2 = xCorner;
             xCorner = temp;
@@ -117,11 +116,10 @@ public class Utils {
                 new Location(location.getWorld(), xCorner2, yCorner2, zCorner2));
     }
 
-    public static List<BuildingMaterial> locationSatisfyBlocks(Location location, BlockFace blockFace, RegionType regionType){
+    public static List<BuildingMaterial> locationSatisfyBlocks(Pair<Location, Location> corners, Location location, RegionType regionType) {
         List<BuildingMaterial> result = new ArrayList<>();
         List<Block> blocks = new ArrayList<>();
 
-        Pair<Location, Location> corners = getRegionCorners(location, blockFace, regionType);
 
         int xCorner = corners.getKey().getBlockX();
         int yCorner = corners.getKey().getBlockY();
@@ -131,85 +129,91 @@ public class Utils {
         int yCorner2 = corners.getValue().getBlockY();
         int zCorner2 = corners.getValue().getBlockZ();
 
-        for(int x = xCorner; x<= xCorner2; x++){
-            for(int y = yCorner; y<=yCorner2; y++){
-                for(int z = zCorner; z<=zCorner2; z++){
+        for (int x = xCorner; x <= xCorner2; x++) {
+            for (int y = yCorner; y <= yCorner2; y++) {
+                for (int z = zCorner; z <= zCorner2; z++) {
                     blocks.add(location.getWorld().getBlockAt(x, y, z));
                 }
             }
         }
 
-        for(BuildingMaterial buildingMaterial : regionType.getBuildingMaterials()){
+        for (BuildingMaterial buildingMaterial : regionType.getBuildingMaterials()) {
             BuildingMaterial bm = new BuildingMaterial(buildingMaterial);
             bm.setAmount(buildingMaterial.materialSatisfy(blocks));
-            if(bm.getAmount() != 0) result.add(bm);
+            if (bm.getAmount() != 0) result.add(bm);
         }
 
         return result;
     }
 
-    public static List<Location> getOutliner(Pair<Location, Location> corners, World world , int steps){
+    public static List<Location> getOutliner(Pair<Location, Location> corners, World world, int steps) {
         List<Location> result = new ArrayList<>();
 
         int xCorner = corners.getKey().getBlockX();
         int yCorner = corners.getKey().getBlockY();
         int zCorner = corners.getKey().getBlockZ();
 
-        int xCorner2 = corners.getValue().getBlockX()+1;
-        int yCorner2 = corners.getValue().getBlockY()+1;
-        int zCorner2 = corners.getValue().getBlockZ()+1;
+        int xCorner2 = corners.getValue().getBlockX() + 1;
+        int yCorner2 = corners.getValue().getBlockY() + 1;
+        int zCorner2 = corners.getValue().getBlockZ() + 1;
 
-        double stepX = (xCorner2 - xCorner)/(double)steps;
-        double stepY = (yCorner2 - yCorner)/(double)steps;
-        double stepZ = (zCorner2 - zCorner)/(double)steps;
+        double stepX = (xCorner2 - xCorner) / (double) steps;
+        double stepY = (yCorner2 - yCorner) / (double) steps;
+        double stepZ = (zCorner2 - zCorner) / (double) steps;
 
-        System.out.println(stepX+" | "+stepY+" | "+stepZ);
+        System.out.println(stepX + " | " + stepY + " | " + stepZ);
 
-        for(int i =0; i<= steps; i++){
+        for (int i = 0; i <= steps; i++) {
             // 111
-            result.add(new Location(world, xCorner+stepX*i, yCorner, zCorner));
-            result.add(new Location(world, xCorner, yCorner+i*stepY, zCorner));
-            result.add(new Location(world, xCorner, yCorner, zCorner+i*stepZ));
+            result.add(new Location(world, xCorner + stepX * i, yCorner, zCorner));
+            result.add(new Location(world, xCorner, yCorner + i * stepY, zCorner));
+            result.add(new Location(world, xCorner, yCorner, zCorner + i * stepZ));
             //122
-            result.add(new Location(world, xCorner2, yCorner2, zCorner+i*stepZ));
-            result.add(new Location(world, xCorner2-i*stepX, yCorner2, zCorner));
-            result.add(new Location(world, xCorner2, yCorner2-i*stepY, zCorner));
+            result.add(new Location(world, xCorner2, yCorner2, zCorner + i * stepZ));
+            result.add(new Location(world, xCorner2 - i * stepX, yCorner2, zCorner));
+            result.add(new Location(world, xCorner2, yCorner2 - i * stepY, zCorner));
             //212
-            result.add(new Location(world, xCorner2, yCorner+stepY*i, zCorner2));
-            result.add(new Location(world, xCorner2-i*stepX, yCorner, zCorner2));
-            result.add(new Location(world, xCorner2, yCorner, zCorner2-i*stepZ));
+            result.add(new Location(world, xCorner2, yCorner + stepY * i, zCorner2));
+            result.add(new Location(world, xCorner2 - i * stepX, yCorner, zCorner2));
+            result.add(new Location(world, xCorner2, yCorner, zCorner2 - i * stepZ));
             //221
-            result.add(new Location(world, xCorner, yCorner2-stepY*i, zCorner2));
-            result.add(new Location(world, xCorner, yCorner2, zCorner2-i*stepZ));
-            result.add(new Location(world, xCorner+i*stepX, yCorner2, zCorner2));
+            result.add(new Location(world, xCorner, yCorner2 - stepY * i, zCorner2));
+            result.add(new Location(world, xCorner, yCorner2, zCorner2 - i * stepZ));
+            result.add(new Location(world, xCorner + i * stepX, yCorner2, zCorner2));
         }
 
         return result;
     }
 
-    public static void showOutliner(Location location, BlockFace blockFace, RegionType regionType, Player player){
+    public static void showOutliner(Location location, BlockFace blockFace, RegionType regionType, Player player, ParticleEffect particleEffect, boolean blockingRegion) {
         Pair<Location, Location> corners = getRegionCorners(location, blockFace, regionType);
         List<Location> outliner = getOutliner(corners, location.getWorld(), 20);
         final Integer[] counter = {20};
-
-        if(bukkitTasks.get(player) != null && !bukkitTasks.get(player).isCancelled()){
-            bukkitTasks.get(player).cancel();
+        if(!blockingRegion) {
+            if (showRegionTasks.get(player) != null && !showRegionTasks.get(player).isCancelled()) {
+                showRegionTasks.get(player).cancel();
+            }
+        } else{
+            if (showBlockingRegionTasks.get(player) != null && !showBlockingRegionTasks.get(player).isCancelled()) {
+                showBlockingRegionTasks.get(player).cancel();
+            }
         }
         BukkitTask task = new BukkitRunnable() {
             @Override
             public void run() {
-                if(player == null || counter[0] <= 0){
+                if (player == null || counter[0] <= 0) {
                     this.cancel();
                     new BukkitRunnable() {
                         @Override
                         public void run() {
-                            bukkitTasks.remove(player);
+                            if(!blockingRegion) showRegionTasks.remove(player);
+                            else showBlockingRegionTasks.remove(player);
                         }
                     }.runTaskLater(MyColony.plugin, 0L);
                     return;
                 }
-                for(Location loc : outliner) {
-                    new ParticleBuilder(ParticleEffect.FLAME, loc)
+                for (Location loc : outliner) {
+                    new ParticleBuilder(particleEffect, loc)
                             .setOffset(new Vector(0.1, 0.1, 0.1))
                             .setSpeed(0F)
                             .display(player);
@@ -217,7 +221,77 @@ public class Utils {
                 counter[0]--;
             }
         }.runTaskTimerAsynchronously(MyColony.plugin, 0L, 10L);
-        bukkitTasks.put(player, task);
+        if(!blockingRegion) showRegionTasks.put(player, task);
+        else showBlockingRegionTasks.put(player, task);
     }
 
+    public static void showOutliner(Region region, Player player, ParticleEffect particleEffect, boolean blockingRegion){
+        showOutliner(region.getLocation(), region.getBlockFace(), region.getRegionType(), player, particleEffect, blockingRegion);
+    }
+
+    public static Region ifRegionIntersects(Pair<Location, Location> corners) {
+
+        Chunk chunk1 = corners.getKey().getChunk();
+        Chunk chunk2 = corners.getValue().getChunk();
+        Set<Chunk> chunks = new HashSet<>();
+        int x0 = Math.min(chunk1.getX() - 3, chunk2.getX() - 3);
+        int x1 = Math.max(chunk1.getX() + 3, chunk2.getX() + 3);
+        int z0 = Math.min(chunk1.getZ() - 3, chunk2.getZ() - 3);
+        int z1 = Math.max(chunk1.getZ() + 3, chunk2.getZ() + 3);
+        System.out.println(chunk1.getX() + " | " + chunk1.getZ() + " :1");
+        System.out.println(chunk2.getX() + " | " + chunk2.getZ() + " :2");
+        System.out.println(x0 + " | " + x1 + "  |  " + z0 + " | " + z1);
+        for (int i = x0; i <= x1; i++) {
+            for (int j = z0; j <= z1; j++) {
+                chunks.add(chunk1.getWorld().getChunkAt(i, j));
+            }
+        }
+
+        for (Chunk chunk : MyColony.regionManager.getRegionMap().keySet()) {
+            System.out.println(chunk);
+        }
+
+        boolean intersects = false;
+        for (Chunk chunk : chunks) {
+            HashMap<Location, Region> regions = MyColony.regionManager.getRegions(chunk);
+            System.out.println("Checking chunk: " + chunk + " \n - " + regions);
+            if (regions == null) continue;
+            System.out.println("checking: " + regions);
+            for (Region region : regions.values()) {
+                Pair<Location, Location> corners2 = region.getCorners();
+                if (ifPolygonsIntersect(corners, corners2)) return region;
+            }
+        }
+        return null;
+
+    }
+
+    private static boolean ifPolygonsIntersect(Pair<Location, Location> corners1, Pair<Location, Location> corners2) {
+        Location corner11 = corners1.getKey();
+        Location corner12 = corners1.getValue();
+        Location corner21 = corners2.getKey();
+        Location corner22 = corners2.getValue();
+
+        int aMinX = corner11.getBlockX();
+        int aMinY = corner11.getBlockY();
+        int aMinZ = corner11.getBlockZ();
+
+        int aMaxX = corner12.getBlockX();
+        int aMaxY = corner12.getBlockY();
+        int aMaxZ = corner12.getBlockZ();
+
+        int bMinX = corner21.getBlockX();
+        int bMinY = corner21.getBlockY();
+        int bMinZ = corner21.getBlockZ();
+
+        int bMaxX = corner22.getBlockX();
+        int bMaxY = corner22.getBlockY();
+        int bMaxZ = corner22.getBlockZ();
+
+        System.out.println(corner11.getBlockX() + " | " + corner11.getBlockY() + " | " + corner11.getBlockZ());
+        System.out.println(corner21.getBlockX() + " | " + corner21.getBlockY() + " | " + corner21.getBlockZ());
+
+        boolean result = (aMaxX >= bMinX && aMinX <= bMaxX) && (aMaxY >= bMinY && aMinY <= bMaxY) && (aMaxZ >= bMinZ && aMinZ <= bMaxZ);
+        return result;
+    }
 }

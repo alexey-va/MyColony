@@ -1,4 +1,4 @@
-region-id: "townhall_1"
+region-id: "cityhall"
 
 right-offset: 3
 left-offset: 3
@@ -8,11 +8,10 @@ up-offset: 3
 down-offset: 3
 
 requirements:
-  - city_level=1
   - permission=kek.lol
 
 level: 1
-is-city: false
+is-city: true
 production:
   0:
     name: test

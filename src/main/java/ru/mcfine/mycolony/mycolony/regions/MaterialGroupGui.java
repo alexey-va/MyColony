@@ -12,6 +12,7 @@ import org.bukkit.inventory.ItemStack;
 import org.jetbrains.annotations.NotNull;
 import ru.mcfine.mycolony.mycolony.MyColony;
 import ru.mcfine.mycolony.mycolony.config.Lang;
+import ru.mcfine.mycolony.mycolony.config.MyConfig;
 import ru.mcfine.mycolony.mycolony.util.Utils;
 
 import java.util.ArrayList;
@@ -28,7 +29,7 @@ public class MaterialGroupGui extends ChestGui {
     public MaterialGroupGui(String groupName, BuildGui parent) {
         super(6, Lang.getString("groups." + groupName + "-display-name"));
 
-        HashSet<Material> mats = MyColony.plugin.config.getMaterialGroup(groupName);
+        HashSet<Material> mats = MyConfig.getMaterialGroup(groupName);
 
         this.parent = parent;
 

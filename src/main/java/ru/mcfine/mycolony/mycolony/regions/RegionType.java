@@ -1,13 +1,17 @@
 package ru.mcfine.mycolony.mycolony.regions;
 
 import org.bukkit.Material;
+import ru.mcfine.mycolony.mycolony.production.ProductionEntry;
+import ru.mcfine.mycolony.mycolony.requirements.Requirement;
 
 import java.util.ArrayList;
+import java.util.Comparator;
+import java.util.List;
+import java.util.stream.Collectors;
 
 public class RegionType {
 
-    private ArrayList<ConsumableType> consumableList = new ArrayList<>();
-    private ArrayList<ConsumableType> productionList = new ArrayList<>();
+    private List<ProductionEntry> productionEntries = new ArrayList<>();
     private int level = 1;
     private int cityLevelForUpgrade = 1;
     private double income = 0;
@@ -19,12 +23,24 @@ public class RegionType {
     private int zForward = 0;
     private int yUp = 0;
     private int yDown = 0;
+    private boolean isCity = false;
+    private Material dynmapMarker = Material.CAKE;
+    private Material shopIcon = Material.BEDROCK;
+    private double price = 1000;
+    private String displayName = "No_name";
+    private boolean enabled = true;
+    private List<Requirement> reqs;
 
-    public RegionType(ArrayList<ConsumableType> consumableList, ArrayList<ConsumableType> productionList, int level, int cityLevelForUpgrade, double income,
+
+    public RegionType(List<ProductionEntry> productionEntries, int level, int cityLevelForUpgrade, double income,
                       ArrayList<RegionType> upgrades, ArrayList<BuildingMaterial> buildingMaterials, int xRight, int xLeft,
-                      int zBackward, int zForward, int yDown, int yUp) {
-        this.productionList = productionList;
-        this.consumableList = consumableList;
+                      int zBackward, int zForward, int yDown, int yUp, boolean isCity, Material dynmapMarker,
+                      Material shopIcon, double price, String displayName, boolean enabled, List<Requirement> reqs) {
+
+        if(productionEntries != null) this.productionEntries = productionEntries.stream().
+                sorted(Comparator.comparingInt(ProductionEntry::getPriority)).collect(Collectors.toList());
+        else this.productionEntries = null;
+
         this.level = level;
         this.cityLevelForUpgrade = cityLevelForUpgrade;
         this.income = income;
@@ -36,15 +52,15 @@ public class RegionType {
         this.zForward = zForward;
         this.yUp = yUp;
         this.yDown = yDown;
+        this.isCity = isCity;
+        this.dynmapMarker = dynmapMarker;
+        this.shopIcon = shopIcon;
+        this.price = price;
+        this.displayName = displayName;
+        this.enabled = enabled;
+        this.reqs = reqs;
     }
 
-    public ArrayList<ConsumableType> getConsumableList() {
-        return consumableList;
-    }
-
-    public void setConsumableList(ArrayList<ConsumableType> consumableList) {
-        this.consumableList = consumableList;
-    }
 
     public int getLevel() {
         return level;
@@ -134,8 +150,72 @@ public class RegionType {
         this.yDown = yDown;
     }
 
-    public ArrayList<ConsumableType> getProductionList() {
-        return productionList;
+    public List<ProductionEntry> getProductionEntries() {
+        return productionEntries;
+    }
+
+    public void setProductionEntries(ArrayList<ProductionEntry> productionEntries) {
+        this.productionEntries = productionEntries;
+    }
+
+    public void setProductionEntries(List<ProductionEntry> productionEntries) {
+        this.productionEntries = productionEntries;
+    }
+
+    public boolean isCity() {
+        return isCity;
+    }
+
+    public void setCity(boolean city) {
+        isCity = city;
+    }
+
+    public Material getDynmapMarker() {
+        return dynmapMarker;
+    }
+
+    public void setDynmapMarker(Material dynmapMarker) {
+        this.dynmapMarker = dynmapMarker;
+    }
+
+    public Material getShopIcon() {
+        return shopIcon;
+    }
+
+    public void setShopIcon(Material shopIcon) {
+        this.shopIcon = shopIcon;
+    }
+
+    public double getPrice() {
+        return price;
+    }
+
+    public void setPrice(double price) {
+        this.price = price;
+    }
+
+    public String getDisplayName() {
+        return displayName;
+    }
+
+    public void setDisplayName(String displayName) {
+        this.displayName = displayName;
+    }
+
+    public boolean isEnabled() {
+        return enabled;
+    }
+
+    public void setEnabled(boolean enabled) {
+        this.enabled = enabled;
+    }
+
+    public List<Requirement> getReqs() {
+        return reqs;
+    }
+
+    public void setReqs(List<Requirement> reqs) {
+        this.reqs = reqs;
     }
 }
 
