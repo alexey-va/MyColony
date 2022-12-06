@@ -1,4 +1,4 @@
-package ru.mcfine.mycolony.mycolony.regions;
+package ru.mcfine.mycolony.mycolony.guis;
 
 import com.github.stefvanschie.inventoryframework.gui.GuiItem;
 import com.github.stefvanschie.inventoryframework.gui.type.ChestGui;
@@ -10,6 +10,7 @@ import org.bukkit.block.Chest;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 import ru.mcfine.mycolony.mycolony.config.Lang;
+import ru.mcfine.mycolony.mycolony.regions.Region;
 import ru.mcfine.mycolony.mycolony.tasks.TickerRunnable;
 
 public class RegionGui extends ChestGui{

@@ -1,4 +1,4 @@
-package ru.mcfine.mycolony.mycolony.requirements;
+package ru.mcfine.mycolony.mycolony.guis;
 
 import com.github.stefvanschie.inventoryframework.gui.GuiItem;
 import com.github.stefvanschie.inventoryframework.gui.type.ChestGui;
@@ -12,6 +12,7 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.material.Chest;
 import org.jetbrains.annotations.NotNull;
+import ru.mcfine.mycolony.mycolony.requirements.Requirement;
 import ru.mcfine.mycolony.mycolony.util.Utils;
 
 import java.util.ArrayList;

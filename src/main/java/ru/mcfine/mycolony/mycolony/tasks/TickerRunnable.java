@@ -7,10 +7,10 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.scheduler.BukkitRunnable;
 import ru.mcfine.mycolony.mycolony.MyColony;
-import ru.mcfine.mycolony.mycolony.regions.BuildGui;
+import ru.mcfine.mycolony.mycolony.guis.BuildGui;
 import ru.mcfine.mycolony.mycolony.regions.GroupItem;
 import ru.mcfine.mycolony.mycolony.regions.Region;
-import ru.mcfine.mycolony.mycolony.regions.RegionGui;
+import ru.mcfine.mycolony.mycolony.guis.RegionGui;
 
 import java.util.HashMap;
 import java.util.Map;

@@ -7,6 +7,8 @@ backward-offset: 3
 up-offset: 3
 down-offset: 3
 
+shop-group: city_centers
+shop-amount: 2
 requirements:
   - city_level=1
   - permission=kek.lol

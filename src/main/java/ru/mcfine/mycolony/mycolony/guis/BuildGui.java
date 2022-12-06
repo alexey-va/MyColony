@@ -1,12 +1,13 @@
-package ru.mcfine.mycolony.mycolony.regions;
+package ru.mcfine.mycolony.mycolony.guis;
 
 import com.github.stefvanschie.inventoryframework.gui.GuiItem;
 import com.github.stefvanschie.inventoryframework.gui.type.ChestGui;
 import com.github.stefvanschie.inventoryframework.pane.OutlinePane;
 import com.github.stefvanschie.inventoryframework.pane.PaginatedPane;
 import com.github.stefvanschie.inventoryframework.pane.Pane;
-import javafx.util.Pair;
 import ru.mcfine.mycolony.mycolony.config.Lang;
+import ru.mcfine.mycolony.mycolony.regions.BuildingMaterial;
+import ru.mcfine.mycolony.mycolony.regions.GroupItem;
 import ru.mcfine.mycolony.mycolony.util.Utils;
 
 import java.util.ArrayList;

@@ -8,7 +8,7 @@ import org.bukkit.event.block.Action;
 import org.bukkit.event.player.PlayerInteractEvent;
 import ru.mcfine.mycolony.mycolony.MyColony;
 import ru.mcfine.mycolony.mycolony.regions.Region;
-import ru.mcfine.mycolony.mycolony.regions.RegionGui;
+import ru.mcfine.mycolony.mycolony.guis.RegionGui;
 import ru.mcfine.mycolony.mycolony.tasks.TickerRunnable;
 
 public class OpenChest implements Listener {

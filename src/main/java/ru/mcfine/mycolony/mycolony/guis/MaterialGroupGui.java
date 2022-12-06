@@ -1,4 +1,4 @@
-package ru.mcfine.mycolony.mycolony.regions;
+package ru.mcfine.mycolony.mycolony.guis;
 
 import com.github.stefvanschie.inventoryframework.gui.GuiItem;
 import com.github.stefvanschie.inventoryframework.gui.type.ChestGui;
@@ -6,11 +6,8 @@ import com.github.stefvanschie.inventoryframework.pane.OutlinePane;
 import com.github.stefvanschie.inventoryframework.pane.PaginatedPane;
 import com.github.stefvanschie.inventoryframework.pane.Pane;
 import com.github.stefvanschie.inventoryframework.pane.StaticPane;
-import javafx.util.Pair;
 import org.bukkit.Material;
 import org.bukkit.inventory.ItemStack;
-import org.jetbrains.annotations.NotNull;
-import ru.mcfine.mycolony.mycolony.MyColony;
 import ru.mcfine.mycolony.mycolony.config.Lang;
 import ru.mcfine.mycolony.mycolony.config.MyConfig;
 import ru.mcfine.mycolony.mycolony.util.Utils;
@@ -18,7 +15,6 @@ import ru.mcfine.mycolony.mycolony.util.Utils;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
-import java.util.stream.Collectors;
 
 public class MaterialGroupGui extends ChestGui {
 

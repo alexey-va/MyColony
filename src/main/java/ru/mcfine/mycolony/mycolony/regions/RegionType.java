@@ -30,12 +30,14 @@ public class RegionType {
     private String displayName = "No_name";
     private boolean enabled = true;
     private List<Requirement> reqs;
+    private String shopGroup;
+    private int shopAmount;
 
 
     public RegionType(List<ProductionEntry> productionEntries, int level, int cityLevelForUpgrade, double income,
                       ArrayList<RegionType> upgrades, ArrayList<BuildingMaterial> buildingMaterials, int xRight, int xLeft,
                       int zBackward, int zForward, int yDown, int yUp, boolean isCity, Material dynmapMarker,
-                      Material shopIcon, double price, String displayName, boolean enabled, List<Requirement> reqs) {
+                      Material shopIcon, double price, String displayName, boolean enabled, List<Requirement> reqs, String shopGroup, int shopAmount) {
 
         if(productionEntries != null) this.productionEntries = productionEntries.stream().
                 sorted(Comparator.comparingInt(ProductionEntry::getPriority)).collect(Collectors.toList());
@@ -59,6 +61,8 @@ public class RegionType {
         this.displayName = displayName;
         this.enabled = enabled;
         this.reqs = reqs;
+        this.shopGroup = shopGroup;
+        this.shopAmount = shopAmount;
     }
 
 
@@ -216,6 +220,14 @@ public class RegionType {
 
     public void setReqs(List<Requirement> reqs) {
         this.reqs = reqs;
+    }
+
+    public String getShopGroup() {
+        return shopGroup;
+    }
+
+    public int getShopAmount() {
+        return shopAmount;
     }
 }
 
