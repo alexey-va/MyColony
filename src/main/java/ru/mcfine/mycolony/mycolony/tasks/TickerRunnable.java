@@ -12,8 +12,8 @@ import ru.mcfine.mycolony.mycolony.regions.GroupItem;
 import ru.mcfine.mycolony.mycolony.regions.Region;
 import ru.mcfine.mycolony.mycolony.guis.RegionGui;
 
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
+import java.util.stream.Collectors;
 
 public class TickerRunnable extends BukkitRunnable {
 
@@ -24,6 +24,7 @@ public class TickerRunnable extends BukkitRunnable {
     }
 
     public static HashMap<RegionGui, Region> mainMenuGuis = new HashMap<>();
+    public static Set<GroupItem> groupItemList = new HashSet<>();
 
     @Override
     public void run() {
@@ -45,19 +46,20 @@ public class TickerRunnable extends BukkitRunnable {
             entry.getKey().update();
         }
 
-        for(BuildGui buildGui : BuildGui.buildGuis){
-            boolean toUpdate = false;
-            for(GroupItem groupItem : buildGui.getGroupItems()){
-                if(groupItem.isGroup) toUpdate = true;
-                groupItem.setNext();
+        List<GroupItem> toRemove = new ArrayList<>();
+        for(GroupItem groupItem : groupItemList){
+            //System.out.println(groupItem +" | "+groupItem.getParent());
+            if(groupItem.getParent() == null || groupItem.getParent().getViewerCount() == 0){
+                toRemove.add(groupItem);
+                continue;
             }
-            if(toUpdate) {
-                buildGui.update();
-            }
+            groupItem.setNext();
+            if(!groupItem.getParent().isUpdating()) groupItem.getParent().update();
         }
+        toRemove.forEach(groupItemList::remove);
     }
 
-    private void updateGui(){
-
+    public static void trimGroupItems(){
+        groupItemList = groupItemList.stream().filter(s -> s.getParent().getViewerCount() > 0).collect(Collectors.toSet());
     }
 }

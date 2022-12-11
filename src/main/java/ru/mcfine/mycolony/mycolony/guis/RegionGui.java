@@ -19,12 +19,12 @@ public class RegionGui extends ChestGui{
     public GuiItem clockItem;
     public RegionGui(Block block, Region region) {
         super(5, Lang.getString(region.getRegionName()+"_name"));
+
         OutlinePane background = new OutlinePane(0, 0, 9, 5, Pane.Priority.LOWEST);
         background.addItem(new GuiItem(new ItemStack(Material.BLACK_STAINED_GLASS_PANE), event -> {
             event.setCancelled(true);
         }));
         background.setRepeat(true);
-
         this.addPane(background);
 
         this.setOnClose(event -> {

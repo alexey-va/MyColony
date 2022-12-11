@@ -7,25 +7,28 @@ import ru.mcfine.mycolony.mycolony.city.SquareArea;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 
 public class RegionMock {
-    public ArrayList<String> playerNames;
+    public Set<String> playerNames;
     public int level;
     public int x, y, z;
     public String worldName;
-    public ArrayList<String> playerUUIDs;
+    public Set<String> playerUUIDs;
     public String regionName;
     public double timeElapsed;
     public double totalIncome;
     public String uuid;
     public double bankDeposit;
+    public String wgName;
+    public String cityWgName;
 
     /// AREA
     public int chunkRadius = -1;
 
     // CITY
     public int population;
-    public List<String> members;
+    public Set<String> members;
 
     public RegionMock(Region region){
         this.playerNames = region.getPlayerNames();
@@ -40,6 +43,7 @@ public class RegionMock {
         this.totalIncome = region.getTotalIncome();
         this.uuid = region.getUuid();
         this.bankDeposit = region.getBankDeposit();
+        this.wgName = region.getWgRegionName();
         if(region instanceof CityRegion cityRegion){
             if(cityRegion.getCityArea() instanceof SquareArea squareArea){
                 this.chunkRadius = squareArea.getChunkRadius();
@@ -47,6 +51,7 @@ public class RegionMock {
 
             this.members = cityRegion.getCityMembers();
             this.population = cityRegion.getCityPopulation();
+            this.cityWgName= cityRegion.getCityWgName();
         }
     }
 }

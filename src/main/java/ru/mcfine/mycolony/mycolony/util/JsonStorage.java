@@ -4,16 +4,22 @@ import com.google.common.reflect.TypeToken;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import ru.mcfine.mycolony.mycolony.MyColony;
+import ru.mcfine.mycolony.mycolony.players.PlayerMock;
 import ru.mcfine.mycolony.mycolony.regions.RegionMock;
 
 import java.io.*;
 import java.lang.reflect.Type;
 import java.util.ArrayList;
+import java.util.List;
 
 public class JsonStorage {
 
     public void loadData(){
         Gson gson = new Gson();
+        loadRegions(gson);
+    }
+
+    private void loadRegions(Gson gson){
         File file = new File(MyColony.plugin.getDataFolder().getAbsolutePath() + File.separator +"storage"+File.separator+"regions.json");
         try{
             file.getParentFile().mkdirs();
@@ -32,6 +38,30 @@ public class JsonStorage {
         try{
             Type listType = new TypeToken<ArrayList<RegionMock>>(){}.getType();
             MyColony.getRegionManager().uploadRegions(gson.fromJson(reader, listType));
+        } catch (Exception ex){
+            ex.printStackTrace();
+        }
+    }
+
+    private void loadPlayers(Gson gson){
+        File file = new File(MyColony.plugin.getDataFolder().getAbsolutePath() + File.separator +"storage"+File.separator+"players.json");
+        try{
+            file.getParentFile().mkdirs();
+            file.createNewFile();
+        } catch (Exception ex){
+            ex.printStackTrace();
+        }
+
+        Reader reader = null;
+        try{
+            reader = new FileReader(file);
+        } catch (Exception ex){
+            ex.printStackTrace();
+        }
+
+        try{
+            Type listType = new TypeToken<List<PlayerMock>>(){}.getType();
+            MyColony.getRegionManager().uploadPlayers(gson.fromJson(reader, listType));
         } catch (Exception ex){
             ex.printStackTrace();
         }

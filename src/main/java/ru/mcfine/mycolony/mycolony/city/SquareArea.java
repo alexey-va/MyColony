@@ -6,7 +6,9 @@ import org.bukkit.Chunk;
 import org.bukkit.Location;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 public class SquareArea extends CityArea{
 
@@ -14,6 +16,8 @@ public class SquareArea extends CityArea{
     private String worldName;
     private int x, y, z;
     private Location center;
+    Set<Chunk> chunks = new HashSet<>();
+    Set<BorderChunk> borderChunks = new HashSet<>();
 
     public SquareArea(int chunkRadius, String worldName, int x, int y, int z) {
         this.chunkRadius = chunkRadius;
@@ -22,6 +26,9 @@ public class SquareArea extends CityArea{
         this.y = y;
         this.z = z;
         this.center = new Location(Bukkit.getWorld(worldName), x, y, z);
+
+        this.chunks = generateChunks();
+        this.borderChunks = generateBorderChunks();
     }
 
     @Override
@@ -40,10 +47,15 @@ public class SquareArea extends CityArea{
         return (isInArea(corners.getKey()) && isInArea(corners.getValue()));
     }
 
-    public List<Chunk> getChunks(){
+    @Override
+    public Set<Chunk> getChunks(){
+        return chunks;
+    }
+
+    public Set<Chunk> generateChunks(){
         if(this.center == null)return null;
         Chunk centerChunk = this.center.getChunk();
-        List<Chunk> chunks = new ArrayList<>();
+        Set<Chunk> chunks = new HashSet<>();
         for(int i=-chunkRadius; i<=chunkRadius;i++){
             for(int j=-chunkRadius; j<=chunkRadius;j++){
                 Chunk chunk = centerChunk.getWorld().getChunkAt(centerChunk.getX() + i, centerChunk.getZ()+j);
@@ -51,6 +63,28 @@ public class SquareArea extends CityArea{
             }
         }
         return chunks;
+    }
+
+
+    @Override
+    public Set<BorderChunk> getBorderChunks(){
+        return this.borderChunks;
+    }
+
+    public Set<BorderChunk> generateBorderChunks() {
+        Set<BorderChunk> result = new HashSet<>();
+        for(Chunk chunk : chunks){
+            boolean xUp =  !chunks.contains(chunk.getWorld().getChunkAt(chunk.getX()+1, chunk.getZ()));
+            boolean xDown = !chunks.contains(chunk.getWorld().getChunkAt(chunk.getX()-1, chunk.getZ()));
+            boolean zUp = !chunks.contains(chunk.getWorld().getChunkAt(chunk.getX(), chunk.getZ()+1));
+            boolean zDown = !chunks.contains(chunk.getWorld().getChunkAt(chunk.getX(), chunk.getZ()-1));
+
+            if(xUp || xDown || zUp || zDown){
+                BorderChunk borderChunk = new BorderChunk(chunk, xUp, xDown, zUp, zDown );
+                result.add(borderChunk);
+            }
+        }
+        return result;
     }
 
 

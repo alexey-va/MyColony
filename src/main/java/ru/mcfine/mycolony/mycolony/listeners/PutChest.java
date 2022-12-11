@@ -6,6 +6,7 @@ import org.bukkit.Material;
 import org.bukkit.NamespacedKey;
 import org.bukkit.block.Block;
 import org.bukkit.block.data.Directional;
+import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.BlockPlaceEvent;
@@ -13,10 +14,13 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.persistence.PersistentDataType;
 import org.bukkit.scheduler.BukkitRunnable;
+import org.bukkit.scheduler.BukkitTask;
 import org.bukkit.util.Vector;
 import ru.mcfine.mycolony.mycolony.MyColony;
+import ru.mcfine.mycolony.mycolony.city.CityArea;
 import ru.mcfine.mycolony.mycolony.city.CityRegion;
 import ru.mcfine.mycolony.mycolony.city.SquareArea;
+import ru.mcfine.mycolony.mycolony.compat.ColonyProtection;
 import ru.mcfine.mycolony.mycolony.config.Lang;
 import ru.mcfine.mycolony.mycolony.guis.BuildGui;
 import ru.mcfine.mycolony.mycolony.regions.*;
@@ -30,44 +34,82 @@ import java.util.*;
 
 public class PutChest implements Listener {
 
+    private static Map<Player, Double> cooldownPutChest = new HashMap<>();
+    private static BukkitTask cooldownTask = null;
+
     @EventHandler
     public void onPutChest(BlockPlaceEvent event) {
         if (event.getBlockPlaced().getType() != Material.CHEST) return;
 
         ItemStack chest = event.getItemInHand();
         ItemMeta meta = chest.getItemMeta();
-        NamespacedKey regionKey = new NamespacedKey(MyColony.plugin, "region_name");
-        String regionName = meta.getPersistentDataContainer().get(regionKey, PersistentDataType.STRING);
+        String regionName = meta.getPersistentDataContainer().get(new NamespacedKey(MyColony.plugin, "region_name"), PersistentDataType.STRING);
+
         if (regionName == null) return;
 
-
-        System.out.println(RegionManager.getCityByLocation(event.getBlockPlaced().getLocation()));
-
         RegionType regionType = MyColony.plugin.config.getRegionType(regionName);
+
+        if (regionType == null) return;
+
+        Utils.clearRegionBordersVis(event.getPlayer());
+        CityArea.clearCityBordersVis(event.getPlayer());
+
+        if (cooldownPutChest.get(event.getPlayer()) != null) {
+            event.getPlayer().sendMessage("Cooldown: " + cooldownPutChest.get(event.getPlayer()));
+            event.setCancelled(true);
+            return;
+        } else {
+            cooldownPutChest.put(event.getPlayer(), 0.5);
+            createCooldownTask();
+        }
+
         List<Requirement> reqs = regionType.getReqs();
         List<Requirement> notSatisfy = new ArrayList<>();
         if (reqs != null && reqs.size() > 0) {
             for (Requirement req : reqs) {
-                System.out.println("Req: " + req.getCityLevels() + " | " + req.getReqRegions() + " | " + req.getPermission() + "| " + req.getReq());
-                if (!req.satisfy(event.getPlayer(), event.getBlockPlaced().getLocation())) {
-                    System.out.println("Not satisfy! " + req.getReq() + " | " + req.getPermission() + " | " + req.getReqRegions() + " | " + req.getCityLevels());
-                    event.setCancelled(true);
-                    notSatisfy.add(req);
-                }
+                if (!req.satisfy(event.getPlayer(), event.getBlockPlaced().getLocation())) notSatisfy.add(req);
             }
         }
         if (notSatisfy.size() > 0) {
+            event.setCancelled(true);
             RequirementGui gui = new RequirementGui(notSatisfy);
             gui.show(event.getPlayer());
             return;
         }
 
-        Block block = event.getBlockPlaced();
-        Utils.showOutliner(block.getLocation(), ((Directional) block.getBlockData()).getFacing(), MyColony.plugin.config.getRegionType(regionName), event.getPlayer(), ParticleEffect.FLAME, false);
+        if (regionType.isCity()) {
+            CityArea cityArea = CityArea.getAreaForCity(regionType, event.getBlockPlaced().getLocation());
+            if (cityArea != null) {
+                CityArea intersectArea = cityArea.whichIntersects();
+                if (intersectArea != null) {
+                    event.getPlayer().sendMessage("Your city intersects with another!");
 
+                    //cityArea.showChunksNearLocation(event.getPlayer().getLocation(), event.getPlayer(), 1, ParticleEffect.FLAME, false);
+                    intersectArea.showChunksNearLocation(event.getPlayer().getLocation().clone().add(0, -1, 0), event.getPlayer(), 1, ParticleEffect.SMOKE_LARGE, true);
+                    event.setCancelled(true);
+                    return;
+                }
+            }
+        }
+
+        Block block = event.getBlockPlaced();
         Pair<Location, Location> corners = Utils.getRegionCorners(event.getBlockPlaced().getLocation(), ((Directional) block.getBlockData()).getFacing(), regionType);
+
+        Utils.showOutliner(block.getLocation(), ((Directional) block.getBlockData()).getFacing(), MyColony.plugin.config.getRegionType(regionName), event.getPlayer(), ParticleEffect.FLAME, false);
+        if(checkRegionIntersection(event, corners)) return;
+        if(checkBuildingMaterials(event, regionType, corners, block.getLocation())) return;
+        createRegion(regionType, event, corners);
+        highlightBlock(block.getLocation(), ParticleEffect.REDSTONE);
+        saveChanges(event.getPlayer());
+
+
+
+    }
+
+
+    private boolean checkRegionIntersection(BlockPlaceEvent event, Pair<Location, Location> corners){
         Region intersectRegion = Utils.ifRegionIntersects(corners);
-        if(intersectRegion != null){
+        if (intersectRegion != null) {
             event.getPlayer().sendMessage("Intersects!");
             event.setCancelled(true);
             new BukkitRunnable() {
@@ -76,56 +118,134 @@ public class PutChest implements Listener {
                     Utils.showOutliner(intersectRegion, event.getPlayer(), ParticleEffect.SMOKE_NORMAL, true);
                 }
             }.runTaskLater(MyColony.plugin, 1L);
-            return;
+            return true;
         }
+        return false;
+    }
 
-        List<BuildingMaterial> mats = Utils.locationSatisfyBlocks(corners,block.getLocation(), MyColony.plugin.config.getRegionType(regionName));
+    private boolean checkBuildingMaterials(BlockPlaceEvent event, RegionType regionType, Pair<Location, Location> corners, Location location){
+        List<BuildingMaterial> mats = Utils.locationSatisfyBlocks(corners, location, regionType);
         if (mats.size() > 0) {
             BuildGui gui = new BuildGui(mats);
             gui.show(event.getPlayer());
             event.setCancelled(true);
-            return;
+            return false;
         }
+        return true;
+    }
 
+    private void highlightBlock(Location location, ParticleEffect particleEffect){
+        new ParticleBuilder(particleEffect, location)
+                .setOffset(new Vector(0.6, 0.6, 0.6))
+                .setSpeed(0.1f)
+                .setAmount(20)
+                .display();
+    }
 
-        ArrayList<String> playerNames = new ArrayList<>();
-        ArrayList<String> playerUUIDs = new ArrayList<>();
-        playerNames.add(event.getPlayer().getName());
-        playerUUIDs.add(event.getPlayer().getUniqueId().toString());
-
-        Region region;
-
-        if (regionType.isCity()) {
-            List<String> members = new ArrayList<>();
-            members.add(event.getPlayer().getName());
-
-            region = new CityRegion(playerNames, 1, block.getX(), block.getY(), block.getZ(),
-                    regionName, block.getWorld().getName(), playerUUIDs, regionType, null, new SquareArea(5,
-                    event.getBlockPlaced().getWorld().getName(), event.getBlockPlaced().getX(), event.getBlockPlaced().getY(),
-                    event.getBlockPlaced().getZ()), members, 1);
-        } else {
-            region = new Region(playerNames, 1, block.getX(), block.getY(), block.getZ(),
-                    regionName, block.getWorld().getName(), playerUUIDs, regionType, null);
-        }
-
-        MyColony.regionManager.addRegion(block.getLocation(), region);
-
-
+    private void saveChanges(Player player){
+        player.sendMessage(Lang.get("region.region-placed"));
         new BukkitRunnable() {
             @Override
             public void run() {
                 MyColony.plugin.getJsonStorage().saveDataSync();
             }
         }.runTaskAsynchronously(MyColony.plugin);
+    }
+
+    private void createRegion(RegionType regionType, BlockPlaceEvent event, Pair<Location, Location> corners){
+        Region region;
+        Block block = event.getBlockPlaced();
+        Set<String> playerNames = new HashSet<>();
+        Set<String> playerUUIDs = new HashSet<>();
+        playerNames.add(event.getPlayer().getName());
+        playerUUIDs.add(event.getPlayer().getUniqueId().toString());
+        String regionName = regionType.getRegionId();
+
+        if (regionType.isCity()) {
+            if (MyColony.protection.ifIntersects(corners, event.getPlayer(), 10, true, null)) {
+                event.getPlayer().sendMessage("WG intersects");
+                event.setCancelled(true);
+                return;
+            }
+
+            CityArea cityArea = CityArea.getAreaForCity(regionType, event.getBlockPlaced().getLocation());
+
+            if (cityArea instanceof SquareArea squareArea) {
+                if (MyColony.protection.ifIntersects(squareArea, event.getPlayer(), 20, true, null)) {
+                    event.getPlayer().sendMessage("WG intersects");
+                    event.setCancelled(true);
+                    return;
+                }
+            }
+
+            String protName = regionName + "_" + event.getPlayer().getName() + "_";
+            for (int i = 1; i < 100; i++) {
+                if (!MyColony.protection.ifRegionExist(protName + i, event.getBlockPlaced().getWorld())) {
+                    protName += i;
+                    break;
+                }
+            }
+
+            Set<String> members = new HashSet<>();
+            members.add(event.getPlayer().getName());
+
+            MyColony.protection.addRegion(corners, event.getPlayer(), protName, 20, playerNames, playerNames);
+
+            String cityProtName = event.getPlayer().getName() + "_city_";
+            for (int i = 1; i < 100; i++) {
+                if (!MyColony.protection.ifRegionExist(cityProtName + i, event.getBlockPlaced().getWorld())) {
+                    cityProtName += i;
+                    break;
+                }
+            }
+
+            MyColony.protection.createCityRegion(cityArea, cityProtName, 10, playerNames, playerNames);
+
+            region = new CityRegion(playerNames, 1, block.getX(), block.getY(), block.getZ(),
+                    regionName, block.getWorld().getName(), playerUUIDs, regionType, null, protName, cityArea, members, 1, cityProtName);
+        } else {
+            if (MyColony.protection.ifIntersects(corners, event.getPlayer(), 20, false, null)) {
+                event.getPlayer().sendMessage("WG intersects");
+                event.setCancelled(true);
+                return;
+            }
+
+            String protName = regionName + "_" + event.getPlayer().getName() + "_";
+            for (int i = 1; i < 100; i++) {
+                if (!MyColony.protection.ifRegionExist(protName + i, event.getBlockPlaced().getWorld())) {
+                    protName += i;
+                    break;
+                }
+            }
+
+            MyColony.protection.addRegion(corners, event.getPlayer(), protName, 20, playerNames, playerNames);
+
+            region = new Region(playerNames, 1, block.getX(), block.getY(), block.getZ(),
+                    regionName, block.getWorld().getName(), playerUUIDs, regionType, null, protName);
+        }
+
+        MyColony.regionManager.addRegion(block.getLocation(), region);
+    }
 
 
-        new ParticleBuilder(ParticleEffect.END_ROD, block.getLocation())
-                .setOffset(new Vector(0.5, 0.5, 0.5))
-                .setSpeed(0.1f)
-                .setAmount(10)
-                .display();
-
-        event.getPlayer().sendMessage(Lang.get("region.region-placed"));
-
+    private static void createCooldownTask() {
+        if (cooldownTask == null || cooldownTask.isCancelled()) {
+            cooldownTask = new BukkitRunnable() {
+                @Override
+                public void run() {
+                    if (cooldownPutChest.size() == 0) {
+                        this.cancel();
+                        return;
+                    }
+                    for (Map.Entry<Player, Double> entry : cooldownPutChest.entrySet()) {
+                        if (entry.getKey() == null || !entry.getKey().isOnline() || entry.getValue() <= 0.01)
+                            cooldownPutChest.remove(entry.getKey());
+                        else {
+                            cooldownPutChest.put(entry.getKey(), entry.getValue() - 0.5);
+                        }
+                    }
+                }
+            }.runTaskTimerAsynchronously(MyColony.plugin, 10L, 10L);
+        }
     }
 }

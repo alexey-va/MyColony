@@ -52,6 +52,25 @@ public class Utils {
         return bg;
     }
 
+    public static ItemStack getBackground(Material material) {
+        ConfigurationSection section = MyColony.plugin.getConfig().getConfigurationSection("background-item");
+        Component displayName = Component.text(" ");
+        int modelData = 0;
+        if (section != null) {
+            displayName = mm.deserialize(section.getString("display-name", " "));
+            modelData = section.getInt("model-data", 0);
+        }
+
+
+        ItemStack bg = new ItemStack(material, 1);
+        ItemMeta meta = bg.getItemMeta();
+        meta.setCustomModelData(modelData);
+        meta.displayName(displayName);
+        bg.setItemMeta(meta);
+
+        return bg;
+    }
+
     public static Pair<Location, Location> getRegionCorners(Location location, BlockFace blockFace, RegionType regionType) {
         int xCorner = location.getBlockX();
         int yCorner = location.getBlockY();
@@ -229,6 +248,25 @@ public class Utils {
         showOutliner(region.getLocation(), region.getBlockFace(), region.getRegionType(), player, particleEffect, blockingRegion);
     }
 
+    public Set<Chunk> getChunksInRadius(Chunk chunk, int radius){
+        Set<Chunk> chunks = new HashSet<>();
+        //chunks.add(chunk);
+
+        int x0 = chunk.getX() - radius;
+        int x1 = chunk.getX() + radius;
+        int z0 = chunk.getZ() - radius;
+        int z1 = chunk.getZ() + radius;
+        World world = chunk.getWorld();
+
+        for (int i = x0; i <= x1; i++) {
+            for (int j = z0; j <= z1; j++) {
+                chunks.add(world.getChunkAt(i, j));
+            }
+        }
+
+        return chunks;
+    }
+
     public static Region ifRegionIntersects(Pair<Location, Location> corners) {
 
         Chunk chunk1 = corners.getKey().getChunk();
@@ -238,25 +276,17 @@ public class Utils {
         int x1 = Math.max(chunk1.getX() + 3, chunk2.getX() + 3);
         int z0 = Math.min(chunk1.getZ() - 3, chunk2.getZ() - 3);
         int z1 = Math.max(chunk1.getZ() + 3, chunk2.getZ() + 3);
-        System.out.println(chunk1.getX() + " | " + chunk1.getZ() + " :1");
-        System.out.println(chunk2.getX() + " | " + chunk2.getZ() + " :2");
-        System.out.println(x0 + " | " + x1 + "  |  " + z0 + " | " + z1);
         for (int i = x0; i <= x1; i++) {
             for (int j = z0; j <= z1; j++) {
                 chunks.add(chunk1.getWorld().getChunkAt(i, j));
             }
         }
 
-        for (Chunk chunk : MyColony.regionManager.getRegionMap().keySet()) {
-            System.out.println(chunk);
-        }
 
         boolean intersects = false;
         for (Chunk chunk : chunks) {
             HashMap<Location, Region> regions = MyColony.regionManager.getRegions(chunk);
-            System.out.println("Checking chunk: " + chunk + " \n - " + regions);
             if (regions == null) continue;
-            System.out.println("checking: " + regions);
             for (Region region : regions.values()) {
                 Pair<Location, Location> corners2 = region.getCorners();
                 if (ifPolygonsIntersect(corners, corners2)) return region;
@@ -288,10 +318,17 @@ public class Utils {
         int bMaxY = corner22.getBlockY();
         int bMaxZ = corner22.getBlockZ();
 
-        System.out.println(corner11.getBlockX() + " | " + corner11.getBlockY() + " | " + corner11.getBlockZ());
-        System.out.println(corner21.getBlockX() + " | " + corner21.getBlockY() + " | " + corner21.getBlockZ());
+        return (aMaxX >= bMinX && aMinX <= bMaxX) && (aMaxY >= bMinY && aMinY <= bMaxY) && (aMaxZ >= bMinZ && aMinZ <= bMaxZ);
+    }
 
-        boolean result = (aMaxX >= bMinX && aMinX <= bMaxX) && (aMaxY >= bMinY && aMinY <= bMaxY) && (aMaxZ >= bMinZ && aMinZ <= bMaxZ);
-        return result;
+    public static void clearRegionBordersVis(Player player){
+        if(showRegionTasks.get(player) != null && !showRegionTasks.get(player).isCancelled()){
+            showRegionTasks.get(player).cancel();
+            showRegionTasks.remove(player);
+        }
+        if(showBlockingRegionTasks.get(player) != null && !showBlockingRegionTasks.get(player).isCancelled()){
+            showBlockingRegionTasks.get(player).cancel();
+            showBlockingRegionTasks.remove(player);
+        }
     }
 }

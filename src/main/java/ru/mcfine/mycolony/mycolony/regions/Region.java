@@ -23,11 +23,11 @@ import ru.mcfine.mycolony.mycolony.util.Utils;
 import java.util.*;
 
 public class Region {
-    private ArrayList<String> playerNames;
+    private Set<String> playerNames;
     private int level;
     private int x, y, z;
     private String worldName;
-    private ArrayList<String> playerUUIDs;
+    private Set<String> playerUUIDs;
     private String regionName;
     private double timeElapsed = 0;
     private double maxTime = 10;
@@ -43,11 +43,12 @@ public class Region {
     private CityRegion cityRegion = null;
     private BlockFace blockFace = null;
     private Pair<Location, Location> corners = null;
+    private String wgRegionName = null;
 
     private static MiniMessage mm = MiniMessage.miniMessage();
 
 
-    public Region(ArrayList<String> playerNames, int level, int x, int y, int z, String regionName, String worldName, ArrayList<String> playerUUIDs, RegionType regionType, String uuid) {
+    public Region(Set<String> playerNames, int level, int x, int y, int z, String regionName, String worldName, Set<String> playerUUIDs, RegionType regionType, String uuid, String wgRegionName) {
         this.regionName = regionName;
         this.playerNames = playerNames;
         this.level = level;
@@ -59,6 +60,7 @@ public class Region {
         this.regionType = regionType;
         if (uuid == null) this.uuid = (UUID.randomUUID().toString());
         else this.uuid = uuid;
+        this.wgRegionName = wgRegionName;
 
         this.location = new Location(Bukkit.getWorld(worldName), x, y, z);
         this.blockFace = ((Directional) location.getBlock().getBlockData()).getFacing();
@@ -70,7 +72,7 @@ public class Region {
         if (this.timeElapsed > maxTime - inc && this.timeElapsed <= maxTime) {
             if (MyColony.plugin.chestSortAPI)
                 ChestSortAPI.sortInventory(((Chest) location.getBlock().getState()).getInventory());
-            System.out.println("Sorting...");
+            //System.out.println("Sorting...");
         } else if (this.timeElapsed > maxTime) {
 
             this.timeElapsed = 0;
@@ -78,12 +80,9 @@ public class Region {
                 boolean success = false;
                 if (selectedChain == null) {
                     for (ProductionEntry productionEntry : this.regionType.getProductionEntries()) {
-                        System.out.println(productionEntry);
+                        //System.out.println(productionEntry);
                         var check = checkProductionConditions(productionEntry);
                         //System.out.println(check +" | "+check.getKey()+" | "+check.getValue().get(0));
-                        for(var s : check.getValue()){
-                            System.out.println(s.material+" | "+s.groupName+" | "+s.amount);
-                        }
                         if (check == null || !(check.getKey() && check.getValue().size() == 0)) continue;
                         takeConsumables(productionEntry);
                         putProduction(productionEntry);
@@ -155,7 +154,7 @@ public class Region {
                             System.out.println("Not damagable?");
                         }
                     }else {
-                        System.out.println(ct.amount+" am| "+(itemStack.getAmount() - ct.amount));
+                        //System.out.println(ct.amount+" am| "+(itemStack.getAmount() - ct.amount));
                         int newAmount = itemStack.getAmount() - ct.amount;
                         if (newAmount < 0) {
                             ct.amount = -newAmount;
@@ -173,14 +172,14 @@ public class Region {
             input.removeAll(clear);
         }
 
-        System.out.println(prod.getInput().get(0).amount);
+        //System.out.println(prod.getInput().get(0).amount);
         return true;
     }
 
     public boolean putProduction(ProductionEntry prod) {
         Inventory inventory = ((Chest) location.getBlock().getState()).getInventory();
         for (ProductionItem output : prod.getOutput()) {
-            System.out.println(output.material +" |out "+output.amount);
+            //System.out.println(output.material +" |out "+output.amount);
             if (output.type == ProductionItem.Type.MONEY) {
                 this.bankDeposit += output.amount;
             } else {
@@ -233,12 +232,12 @@ public class Region {
             List<ProductionItem> clear = new ArrayList<>();
             for (var in : input) {
                 if (in.hasMaterial(itemStack.getType())) {
-                    System.out.println(in.type);
+                    //System.out.println(in.type);
                     if (in.type == ProductionItem.Type.TOOL || in.type == ProductionItem.Type.TOOL_GROUP) {
                         ItemMeta meta = itemStack.getItemMeta();
                         if (meta instanceof Damageable damageable) {
                             int usesLeft = itemStack.getType().getMaxDurability() - damageable.getDamage();
-                            System.out.println(itemStack.getType().getMaxDurability()+" | "+damageable.getDamage());
+                            //System.out.println(itemStack.getType().getMaxDurability()+" | "+damageable.getDamage());
                             if (usesLeft > in.amount) {
                                 clear.add(in);
                             } else if (usesLeft == in.amount) {
@@ -311,11 +310,11 @@ public class Region {
         this.regionName = regionName;
     }
 
-    public ArrayList<String> getPlayerNames() {
+    public Set<String> getPlayerNames() {
         return playerNames;
     }
 
-    public void setPlayerNames(ArrayList<String> playerNames) {
+    public void setPlayerNames(Set<String> playerNames) {
         this.playerNames = playerNames;
     }
 
@@ -363,11 +362,11 @@ public class Region {
         this.worldName = worldName;
     }
 
-    public ArrayList<String> getPlayerUUIDs() {
+    public Set<String> getPlayerUUIDs() {
         return playerUUIDs;
     }
 
-    public void setPlayerUUID(ArrayList<String> playerUUIDs) {
+    public void setPlayerUUID(Set<String> playerUUIDs) {
         this.playerUUIDs = playerUUIDs;
     }
 
@@ -433,5 +432,9 @@ public class Region {
 
     public static MiniMessage getMm() {
         return mm;
+    }
+
+    public String getWgRegionName() {
+        return wgRegionName;
     }
 }

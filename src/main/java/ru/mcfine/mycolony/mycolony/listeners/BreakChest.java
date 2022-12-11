@@ -7,6 +7,9 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.block.BlockBreakEvent;
 import org.bukkit.scheduler.BukkitRunnable;
 import ru.mcfine.mycolony.mycolony.MyColony;
+import ru.mcfine.mycolony.mycolony.city.CityRegion;
+import ru.mcfine.mycolony.mycolony.regions.Region;
+import ru.mcfine.mycolony.mycolony.regions.RegionMock;
 
 import java.util.List;
 
@@ -16,11 +19,12 @@ public class BreakChest implements Listener {
     public void onBreakChest(BlockBreakEvent event){
         if(event.getBlock().getType() != Material.CHEST) return;
         if(!MyColony.regionManager.isRegionBlock(event.getBlock())){
-            System.out.println("Not region block");
             return;
         }
+        Region region = MyColony.regionManager.getRegion(event.getBlock().getLocation());
+        MyColony.protection.removeRegion(region.getWgRegionName(), region.getLocation().getWorld());
+        if(region instanceof CityRegion cityRegion) MyColony.protection.removeRegion(cityRegion.getCityWgName(), region.getLocation().getWorld());
         MyColony.regionManager.removeRegion(event.getBlock().getLocation());
-        System.out.println("Region removed");
 
         new BukkitRunnable() {
             @Override

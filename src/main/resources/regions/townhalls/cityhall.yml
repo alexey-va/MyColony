@@ -1,4 +1,7 @@
 region-id: "cityhall"
+display-name: "City Hall"
+shop-group: city
+shop-amount: 1
 
 right-offset: 3
 left-offset: 3
@@ -12,6 +15,8 @@ requirements:
 
 level: 1
 is-city: true
+chunk-radius: 1
+
 production:
   0:
     name: test

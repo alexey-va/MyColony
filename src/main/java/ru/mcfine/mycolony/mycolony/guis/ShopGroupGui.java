@@ -5,7 +5,9 @@ import com.github.stefvanschie.inventoryframework.gui.type.ChestGui;
 import com.github.stefvanschie.inventoryframework.pane.OutlinePane;
 import com.github.stefvanschie.inventoryframework.pane.PaginatedPane;
 import com.github.stefvanschie.inventoryframework.pane.Pane;
+import com.github.stefvanschie.inventoryframework.pane.StaticPane;
 import net.kyori.adventure.text.Component;
+import org.bukkit.Material;
 import org.bukkit.entity.HumanEntity;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
@@ -21,17 +23,11 @@ import java.util.List;
 public class ShopGroupGui extends ChestGui {
     private List<GuiItem> guiItemList = new ArrayList<>();
     private ShopMenu parentMenu;
-    public ShopGroupGui(String groupName, ShopMenu parentMenu) {
-        super(3, groupName);
+    public ShopGroupGui(ShopGroup shopGroup, ShopMenu parentMenu) {
+        super(3, shopGroup.getGroupName());
         this.parentMenu = parentMenu;
-        ShopGroup shopGroup = MyColony.plugin.config.getShopGroups().get(groupName);
-        if(shopGroup == null){
-            System.out.println("Group "+groupName+" not found!");
-            this.getViewers().forEach(HumanEntity::closeInventory);
-            return;
-        }
 
-        int rows = (int)Math.ceil(shopGroup.getRegionTypes().size()/7.0);
+        int rows = Math.max((int)Math.ceil(shopGroup.getRegionTypes().size()/7.0),1);
         int invRows = Math.min(6, rows+2);
         this.setRows(invRows);
 
@@ -42,8 +38,16 @@ public class ShopGroupGui extends ChestGui {
         background.setRepeat(true);
         this.addPane(background);
 
+        if(invRows -2 >0) {
+            OutlinePane background2 = new OutlinePane(1, 1, 7, invRows-2, Pane.Priority.LOW);
+            background2.addItem(new GuiItem(Utils.getBackground(Material.GRAY_STAINED_GLASS_PANE), event -> event.setCancelled(true)));
+            background2.setRepeat(true);
+            this.addPane(background2);
+        }
+
         PaginatedPane shopPane = new PaginatedPane(1,1, 7, invRows-2);
         for(RegionType regionType : shopGroup.getRegionTypes()){
+            System.out.println("Region type: "+regionType);
             ItemStack itemStack = new ItemStack(regionType.getShopIcon(), regionType.getShopAmount());
             ItemMeta itemMeta = itemStack.getItemMeta();
             itemMeta.displayName(Component.text(regionType.getDisplayName()));
@@ -53,9 +57,37 @@ public class ShopGroupGui extends ChestGui {
             itemMeta.lore(descr);
             itemStack.setItemMeta(itemMeta);
             GuiItem guiItem = new GuiItem(itemStack, inventoryClickEvent -> {
-
+                ShopItemGui shopItemGui = new ShopItemGui(regionType, this);
+                shopItemGui.show(inventoryClickEvent.getWhoClicked());
+                inventoryClickEvent.setCancelled(true);
             });
+            guiItemList.add(guiItem);
         }
+        shopPane.populateWithGuiItems(guiItemList);
+        this.addPane(shopPane);
+
+        StaticPane navigation = new StaticPane(0, invRows-1, 9, 1, Pane.Priority.HIGH);
+        GuiItem prev = new GuiItem(new ItemStack(Material.RED_WOOL), inventoryClickEvent -> {
+            if(shopPane.getPage() == 0){
+                parentMenu.show(inventoryClickEvent.getWhoClicked());
+            } else{
+                shopPane.setPage(shopPane.getPage() -1);
+                this.update();
+            }
+        });
+        navigation.addItem(prev, 0 ,0 );
+
+        GuiItem next = new GuiItem(new ItemStack(Material.GREEN_WOOL), inventoryClickEvent -> {
+            if(shopPane.getPages() ==1) return;
+           if(shopPane.getPage() == shopPane.getPages() - 1){
+               shopPane.setPage(0);
+           } else{
+               shopPane.setPage(shopPane.getPage()+1);
+           }
+           this.update();
+        });
+        navigation.addItem(next, 8, 0);
+        this.addPane(navigation);
 
     }
 }

@@ -6,6 +6,7 @@ import com.github.stefvanschie.inventoryframework.pane.OutlinePane;
 import com.github.stefvanschie.inventoryframework.pane.PaginatedPane;
 import com.github.stefvanschie.inventoryframework.pane.Pane;
 import net.kyori.adventure.text.Component;
+import org.bukkit.Material;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 import ru.mcfine.mycolony.mycolony.MyColony;
@@ -24,12 +25,20 @@ public class ShopMenu extends ChestGui {
     public ShopMenu() {
         super(3, "Shop");
         this.setRows(rows);
+
         OutlinePane background = new OutlinePane(0,0,9,rows, Pane.Priority.LOWEST);
         background.setRepeat(true);
         background.addItem(new GuiItem(Utils.getBackground(), event -> {
             event.setCancelled(true);
         }));
         this.addPane(background);
+
+        if(rows - 2 > 0) {
+            OutlinePane background2 = new OutlinePane(1, 1, 7, rows - 2, Pane.Priority.LOW);
+            background2.addItem(new GuiItem(new ItemStack(Material.GRAY_STAINED_GLASS_PANE), event -> event.setCancelled(true)));
+            background2.setRepeat(true);
+            this.addPane(background2);
+        }
 
         PaginatedPane shopPane = new PaginatedPane(1,1,7, 1, Pane.Priority.HIGH);
         for(ShopGroup shopGroup : MyColony.plugin.config.getShopGroups().values()){
@@ -42,8 +51,13 @@ public class ShopMenu extends ChestGui {
             itemMeta.lore(loreComponents);
             itemStack.setItemMeta(itemMeta);
             GuiItem guiItem = new GuiItem(itemStack, event -> {
-                event
+                event.setCancelled(true);
+                ShopGroupGui shopGroupGui = new ShopGroupGui(shopGroup, this);
+                shopGroupGui.show(event.getWhoClicked());
             });
+            guiItemList.add(guiItem);
         }
+        shopPane.populateWithGuiItems(guiItemList);
+        this.addPane(shopPane);
     }
 }

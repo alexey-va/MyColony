@@ -28,16 +28,22 @@ public class RegionType {
     private Material shopIcon = Material.BEDROCK;
     private double price = 1000;
     private String displayName = "No_name";
+    private String regionId;
     private boolean enabled = true;
     private List<Requirement> reqs;
     private String shopGroup;
     private int shopAmount;
+    private List<String>
+
+
+
+    private int baseChunkRadius;
 
 
     public RegionType(List<ProductionEntry> productionEntries, int level, int cityLevelForUpgrade, double income,
                       ArrayList<RegionType> upgrades, ArrayList<BuildingMaterial> buildingMaterials, int xRight, int xLeft,
                       int zBackward, int zForward, int yDown, int yUp, boolean isCity, Material dynmapMarker,
-                      Material shopIcon, double price, String displayName, boolean enabled, List<Requirement> reqs, String shopGroup, int shopAmount) {
+                      Material shopIcon, double price, String displayName, boolean enabled, List<Requirement> reqs, String shopGroup, int shopAmount, String regionId) {
 
         if(productionEntries != null) this.productionEntries = productionEntries.stream().
                 sorted(Comparator.comparingInt(ProductionEntry::getPriority)).collect(Collectors.toList());
@@ -63,6 +69,42 @@ public class RegionType {
         this.reqs = reqs;
         this.shopGroup = shopGroup;
         this.shopAmount = shopAmount;
+        this.regionId = regionId;
+    }
+
+    public RegionType(List<ProductionEntry> productionEntries, int level, int cityLevelForUpgrade, double income,
+                      ArrayList<RegionType> upgrades, ArrayList<BuildingMaterial> buildingMaterials, int xRight, int xLeft,
+                      int zBackward, int zForward, int yDown, int yUp, boolean isCity, Material dynmapMarker,
+                      Material shopIcon, double price, String displayName, boolean enabled, List<Requirement> reqs, String shopGroup,
+                      int shopAmount, String regionId ,int chunkRadius) {
+
+        if(productionEntries != null) this.productionEntries = productionEntries.stream().
+                sorted(Comparator.comparingInt(ProductionEntry::getPriority)).collect(Collectors.toList());
+        else this.productionEntries = null;
+
+        this.level = level;
+        this.cityLevelForUpgrade = cityLevelForUpgrade;
+        this.income = income;
+        this.upgrades = upgrades;
+        this.buildingMaterials = buildingMaterials;
+        this.xLeft = xLeft;
+        this.xRight = xRight;
+        this.zBackward = zBackward;
+        this.zForward = zForward;
+        this.yUp = yUp;
+        this.yDown = yDown;
+        this.isCity = isCity;
+        this.dynmapMarker = dynmapMarker;
+        this.shopIcon = shopIcon;
+        this.price = price;
+        this.displayName = displayName;
+        this.enabled = enabled;
+        this.reqs = reqs;
+        this.shopGroup = shopGroup;
+        this.shopAmount = shopAmount;
+        this.regionId = regionId;
+
+        this.baseChunkRadius = chunkRadius;
     }
 
 
@@ -228,6 +270,14 @@ public class RegionType {
 
     public int getShopAmount() {
         return shopAmount;
+    }
+
+    public int getBaseChunkRadius() {
+        return baseChunkRadius;
+    }
+
+    public String getRegionId() {
+        return regionId;
     }
 }
 

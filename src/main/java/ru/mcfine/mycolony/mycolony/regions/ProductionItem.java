@@ -47,4 +47,27 @@ public class ProductionItem {
         TOOL_GROUP
     }
 
+    public Material getMaterial() {
+        return material;
+    }
+
+    public int getAmount() {
+        return amount;
+    }
+
+    public String getGroupName() {
+        return groupName;
+    }
+
+    public HashSet<Material> getGroup() {
+        return group;
+    }
+
+    public Type getType() {
+        return type;
+    }
+
+    public double getMoneyAmount() {
+        return moneyAmount;
+    }
 }

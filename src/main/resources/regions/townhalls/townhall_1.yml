@@ -1,4 +1,7 @@
 region-id: "townhall_1"
+display-name: "Town Hall"
+shop-group: default
+shop-amount: 1
 
 right-offset: 3
 left-offset: 3
@@ -7,8 +10,6 @@ backward-offset: 3
 up-offset: 3
 down-offset: 3
 
-shop-group: city_centers
-shop-amount: 2
 requirements:
   - city_level=1
   - permission=kek.lol

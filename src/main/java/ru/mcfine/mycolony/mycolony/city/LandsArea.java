@@ -8,9 +8,7 @@ import org.bukkit.Location;
 import org.bukkit.World;
 import ru.mcfine.mycolony.mycolony.MyColony;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
+import java.util.*;
 
 public class LandsArea extends CityArea{
 
@@ -36,12 +34,17 @@ public class LandsArea extends CityArea{
     }
 
     @Override
-    public List<Chunk> getChunks() {
+    public Set<Chunk> getChunks() {
         Collection<ChunkCoordinate> chunks = this.land.getChunks(world);
-        List<Chunk> result = new ArrayList<>();
+        Set<Chunk> result = new HashSet<>();
         for(ChunkCoordinate chunkCoordinate : chunks){
             result.add(world.getChunkAt(chunkCoordinate.getX(), chunkCoordinate.getZ()));
         }
         return result;
+    }
+
+    @Override
+    public Set<BorderChunk> getBorderChunks() {
+        return null;
     }
 }

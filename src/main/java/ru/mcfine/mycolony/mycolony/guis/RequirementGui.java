@@ -33,6 +33,11 @@ public class RequirementGui extends ChestGui {
         background.setRepeat(true);
         this.addPane(background);
 
+        OutlinePane background2 = new OutlinePane(1,1,7,3, Pane.Priority.LOW);
+        background2.addItem(new GuiItem(Utils.getBackground(Material.GRAY_STAINED_GLASS_PANE), event -> event.setCancelled(true)));
+        background2.setRepeat(true);
+        this.addPane(background2);
+
         PaginatedPane staticPane = new PaginatedPane(1,1, 7, 1, Pane.Priority.HIGH);
 
         for(Requirement req : requirements){

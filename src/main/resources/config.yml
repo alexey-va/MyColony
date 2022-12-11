@@ -19,10 +19,17 @@ building-material-groups:
 shop-groups:
   city:
     priority: 1
-    icon: BEDROCK
+    icon: GRASS_BLOCK
     icon-amount: 1
     name: "Cities"
     description:
       - "Hello"
       - "Kek"
     permission: abd.asd
+  default:
+    priority: 1
+    icon: "COBBLESTONE"
+    icon-amount: 1
+    name: Basic
+    description:
+      - "Just basic"

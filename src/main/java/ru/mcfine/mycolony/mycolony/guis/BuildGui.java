@@ -5,6 +5,8 @@ import com.github.stefvanschie.inventoryframework.gui.type.ChestGui;
 import com.github.stefvanschie.inventoryframework.pane.OutlinePane;
 import com.github.stefvanschie.inventoryframework.pane.PaginatedPane;
 import com.github.stefvanschie.inventoryframework.pane.Pane;
+import org.bukkit.Material;
+import org.bukkit.inventory.ItemStack;
 import ru.mcfine.mycolony.mycolony.config.Lang;
 import ru.mcfine.mycolony.mycolony.regions.BuildingMaterial;
 import ru.mcfine.mycolony.mycolony.regions.GroupItem;
@@ -20,7 +22,6 @@ public class BuildGui extends ChestGui {
     int vPadding = 2;
     public PaginatedPane materialPane = null;
     private ArrayList<GroupItem> groupItems = new ArrayList<>();
-    public static HashSet<BuildGui> buildGuis = new HashSet<>();
 
     public BuildGui(List<BuildingMaterial> mats) {
         super(6, Lang.getString("menu.not-enough-materials"));
@@ -36,6 +37,17 @@ public class BuildGui extends ChestGui {
         background.setRepeat(true);
         this.addPane(background);
 
+        if(rows - 2 > 0) {
+            OutlinePane background2 = new OutlinePane(1, 1, 7, rows - 2, Pane.Priority.LOW);
+            background2.addItem(new GuiItem(Utils.getBackground(Material.GRAY_STAINED_GLASS_PANE), event -> event.setCancelled(true)));
+            background2.setRepeat(true);
+            this.addPane(background2);
+        }
+
+        setOnClose(close -> {
+            Utils.getBackground(Material.GRAY_STAINED_GLASS_PANE);
+        });
+
         materialPane = new PaginatedPane(wPadding/2, vPadding/2, 9-wPadding, 9-vPadding, Pane.Priority.NORMAL);
 
         int id = 0;
@@ -44,7 +56,7 @@ public class BuildGui extends ChestGui {
         for(BuildingMaterial material : mats){
             int amount = material.getAmount();
             while(amount > 0){
-                GroupItem groupItem = new GroupItem(material, Math.min(64, material.getAmount()), this);
+                GroupItem groupItem = new GroupItem(material, Math.min(64, material.getAmount()), this, groupItems);
                 groupItems.add(groupItem);
                 guiItems.add(groupItem.getGuiItem());
                 id++;
@@ -53,17 +65,7 @@ public class BuildGui extends ChestGui {
         }
 
         materialPane.populateWithGuiItems(guiItems);
-
-
         this.addPane(materialPane);
-
-        buildGuis.add(this);
-
-        this.setOnClose(event -> {
-            buildGuis.remove(this);
-        });
-
-
     }
 
 

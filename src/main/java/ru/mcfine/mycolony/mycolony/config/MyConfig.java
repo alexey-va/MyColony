@@ -36,11 +36,11 @@ public class MyConfig {
         loadConfig();
 
         String fileSeparator = FileSystems.getDefault().getSeparator();
-        File regions = new File(MyColony.plugin.getDataFolder().toString() + fileSeparator + "regions");
+        File regions = new File(MyColony.plugin.getDataFolder() + fileSeparator + "regions");
         if (!regions.exists()) regions.mkdirs();
 
         try (Stream<Path> stream = Files.walk(Paths.get(regions.getPath()))) {
-            stream.forEach(path -> readRegionFile(path.toFile()));
+            stream.filter(path -> path.toString().endsWith(".yml")).forEach(path -> readRegionFile(path.toFile()));
         } catch (Exception ex) {
             ex.printStackTrace();
         }
@@ -67,7 +67,6 @@ public class MyConfig {
     }
 
     private void readRegionFile(File file) {
-
         FileConfiguration data = YamlConfiguration.loadConfiguration(file);
         String name = data.getString("region-id", "default-id");
 
@@ -108,6 +107,7 @@ public class MyConfig {
         double time = data.getDouble("period", 100);
         String shopGroup = data.getString("shop-group", "default");
         int shopAmount = data.getInt("shop-amount", 1);
+        int chunkRadius = data.getInt("chunk-radius", 5);
 
 
         if (effectList != null) {
@@ -124,7 +124,7 @@ public class MyConfig {
         RegionType regionType = new RegionType(productionEntries,
                 level, 1, 0, null, matList,
                 xRight, xLeft, zBackward, zForward, yDown, yUp, isCity, dynmapMarker,
-                shopIcon, price, displayName, enabled, requirementEntries, shopGroup, shopAmount);
+                shopIcon, price, displayName, enabled, requirementEntries, shopGroup, shopAmount, name, chunkRadius);
 
         for (var req : regionType.getReqs()) {
             System.out.println(req.getCityLevels() + " \n " + req.getReqRegions() + " \n " + req.getReq() + " | " + req.getPermission());
@@ -302,14 +302,14 @@ public class MyConfig {
                 int priority = section.getInt(key+".priority", 1);
                 String iconString = section.getString(key+".icon", "BEDROCK");
                 Material material = Material.matchMaterial(iconString);
-                if(material == null) material = Material.BEDROCK;
+                if(material == null) material = Material.REDSTONE_BLOCK;
                 int iconAmount = section.getInt(key+".icon-amount", 1);
                 String name = section.getString(key+".name", "No name");
                 List<String> descriptionList = section.getStringList(key+".description");
                 String permission = section.getString(key+".permission", null);
 
                 ShopGroup shopGroup = new ShopGroup(name, material, iconAmount, permission, descriptionList, priority);
-                this.shopGroups.put(name, shopGroup);
+                this.shopGroups.put(key, shopGroup);
             }
         }
 

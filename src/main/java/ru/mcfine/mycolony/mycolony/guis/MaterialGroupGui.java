@@ -2,6 +2,7 @@ package ru.mcfine.mycolony.mycolony.guis;
 
 import com.github.stefvanschie.inventoryframework.gui.GuiItem;
 import com.github.stefvanschie.inventoryframework.gui.type.ChestGui;
+import com.github.stefvanschie.inventoryframework.gui.type.util.Gui;
 import com.github.stefvanschie.inventoryframework.pane.OutlinePane;
 import com.github.stefvanschie.inventoryframework.pane.PaginatedPane;
 import com.github.stefvanschie.inventoryframework.pane.Pane;
@@ -10,23 +11,28 @@ import org.bukkit.Material;
 import org.bukkit.inventory.ItemStack;
 import ru.mcfine.mycolony.mycolony.config.Lang;
 import ru.mcfine.mycolony.mycolony.config.MyConfig;
+import ru.mcfine.mycolony.mycolony.regions.GroupItem;
+import ru.mcfine.mycolony.mycolony.tasks.TickerRunnable;
 import ru.mcfine.mycolony.mycolony.util.Utils;
 
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
+import java.util.stream.Collectors;
 
 public class MaterialGroupGui extends ChestGui {
 
     int vPadding = 2;
     int wPadding = 2;
-    BuildGui parent;
+    Gui parent;
+    List<GroupItem> groupItems;
 
-    public MaterialGroupGui(String groupName, BuildGui parent) {
+    public MaterialGroupGui(String groupName, Gui parent, List<GroupItem> groupItems) {
         super(6, Lang.getString("groups." + groupName + "-display-name"));
 
         HashSet<Material> mats = MyConfig.getMaterialGroup(groupName);
 
+        this.groupItems=groupItems;
         this.parent = parent;
 
         int rows = Math.min(6, (int)(Math.ceil(mats.size()/(9.0-wPadding) ) ) );
@@ -39,6 +45,13 @@ public class MaterialGroupGui extends ChestGui {
         background.addItem(bgItem);
         background.setRepeat(true);
         this.addPane(background);
+
+        if(rows -2 > 0) {
+            OutlinePane background2 = new OutlinePane(1, 1, 7, 4, Pane.Priority.LOW);
+            background2.addItem(new GuiItem(Utils.getBackground(Material.GRAY_STAINED_GLASS_PANE), event -> event.setCancelled(true)));
+            background2.setRepeat(true);
+            this.addPane(background2);
+        }
 
         PaginatedPane materialPane = new PaginatedPane(wPadding / 2, vPadding / 2, 9 - wPadding, rows - vPadding, Pane.Priority.NORMAL);
         List<ItemStack> itemStacks = new ArrayList<>();
@@ -62,7 +75,7 @@ public class MaterialGroupGui extends ChestGui {
             }
             else{
                 parent.show(event.getWhoClicked());
-                BuildGui.buildGuis.add(parent);
+                if(groupItems != null) TickerRunnable.groupItemList.addAll(groupItems.stream().filter(s -> s.isGroup).toList());
             }
         });
         navigation.addItem(prevPage, 0, 0);

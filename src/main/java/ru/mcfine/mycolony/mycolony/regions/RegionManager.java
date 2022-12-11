@@ -1,22 +1,14 @@
 package ru.mcfine.mycolony.mycolony.regions;
 
 import com.jeff_media.customblockdata.CustomBlockData;
-import it.unimi.dsi.fastutil.Hash;
-import me.angeschossen.lands.api.land.Land;
-import org.bukkit.Chunk;
-import org.bukkit.Location;
-import org.bukkit.NamespacedKey;
-import org.bukkit.World;
+import org.bukkit.*;
 import org.bukkit.block.Block;
-import org.bukkit.entity.Player;
 import org.bukkit.persistence.PersistentDataType;
 import ru.mcfine.mycolony.mycolony.MyColony;
 import ru.mcfine.mycolony.mycolony.city.CityArea;
 import ru.mcfine.mycolony.mycolony.city.CityRegion;
-import ru.mcfine.mycolony.mycolony.city.LandsArea;
 import ru.mcfine.mycolony.mycolony.city.SquareArea;
-import ru.mcfine.mycolony.mycolony.config.MyConfig;
-import ru.mcfine.mycolony.mycolony.util.JsonStorage;
+import ru.mcfine.mycolony.mycolony.players.ColonyPlayer;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -26,13 +18,14 @@ public class RegionManager {
 
 
     private HashMap<Chunk, HashMap<Location,Region>> regionMap = new HashMap<>();
-    private static HashMap<String, List<Region>> playerRegions = new HashMap<>();
-    private static List<CityRegion> cityRegions = new ArrayList<>();
+    public static HashMap<String, ColonyPlayer> colonyPlayers = new HashMap<>();
+    public static List<CityRegion> cityRegions = new ArrayList<>();
     public RegionManager(HashMap<Chunk, HashMap<Location, Region>> regionMap) {
         this.regionMap = regionMap;
     }
 
     public RegionManager(){
+
     }
 
     public HashMap<Location, Region> getRegions(Chunk chunk){
@@ -58,10 +51,11 @@ public class RegionManager {
         if(region instanceof CityRegion cityRegion) cityRegions.add(cityRegion);
 
         for(String playerName : region.getPlayerNames()){
-            List<Region> reg = playerRegions.get(playerName);
-            if(reg == null) reg = new ArrayList<>();
-            if(!reg.contains(region)) reg.add(region);
-            playerRegions.put(playerName, reg);
+            if(colonyPlayers.get(playerName) == null){
+                OfflinePlayer offlinePlayer = Bukkit.getOfflinePlayer(playerName);
+                colonyPlayers.put(playerName, new ColonyPlayer(playerName, offlinePlayer.getUniqueId().toString(), new ArrayList<>()));
+            }
+            colonyPlayers.get(playerName).getRegions().add(region);
         }
 
         CustomBlockData container = new CustomBlockData(location.getBlock(), MyColony.plugin);
@@ -110,7 +104,7 @@ public class RegionManager {
             Location location = new Location(world, regionMock.x, regionMock.y, regionMock.z);
             //Chunk chunk = location.getChunk();
             RegionType regionType = MyColony.plugin.config.getRegionType(regionMock.regionName);
-            System.out.println(regionMock.regionName);
+            //System.out.println(regionMock.regionName);
 
             if(regionType == null){
                 MyColony.plugin.getLogger().severe("Region type "+regionMock.regionName+" not found!");
@@ -126,13 +120,13 @@ public class RegionManager {
                 }
 
                 region = new CityRegion(regionMock.playerNames, regionMock.level, regionMock.x, regionMock.y, regionMock.z,
-                        regionMock.regionName, regionMock.worldName, regionMock.playerUUIDs, regionType, regionMock.uuid,
-                        cityArea, regionMock.members, regionMock.population);
+                        regionMock.regionName, regionMock.worldName, regionMock.playerUUIDs, regionType, regionMock.uuid, regionMock.wgName,
+                        cityArea, regionMock.members, regionMock.population, regionMock.cityWgName);
             } else{
                 region = new Region(regionMock.playerNames, regionMock.level, regionMock.x, regionMock.y, regionMock.z,
-                        regionMock.regionName, regionMock.worldName, regionMock.playerUUIDs, regionType, regionMock.uuid);
+                        regionMock.regionName, regionMock.worldName, regionMock.playerUUIDs, regionType, regionMock.uuid, regionMock.wgName);
             }
-            System.out.println(region);
+            //System.out.println(region);
             addRegion(location, region);
 
         }
@@ -157,8 +151,14 @@ public class RegionManager {
     }
 
     public static List<Region> getPlayerRegions(String playerName){
-        return playerRegions.get(playerName);
+        return colonyPlayers.get(playerName).getRegions();
     }
 
     public static List<CityRegion> getCityRegions(){ return cityRegions;}
+
+    public void uploadPlayers(Object fromJson) {
+
+
+
+    }
 }
