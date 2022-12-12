@@ -44,6 +44,7 @@ public class Region {
     private BlockFace blockFace = null;
     private Pair<Location, Location> corners = null;
     private String wgRegionName = null;
+    private double timeSinceCreation = 0;
 
     private static MiniMessage mm = MiniMessage.miniMessage();
 
@@ -436,5 +437,13 @@ public class Region {
 
     public String getWgRegionName() {
         return wgRegionName;
+    }
+
+    public double getTimeSinceCreation() {
+        return timeSinceCreation;
+    }
+
+    public void setTimeSinceCreation(double timeSinceCreation) {
+        this.timeSinceCreation = timeSinceCreation;
     }
 }

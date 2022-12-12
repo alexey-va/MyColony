@@ -4,6 +4,7 @@ main: ru.mcfine.mycolony.mycolony.MyColony
 api-version: 1.19
 load: POSTWORLD
 softdepend: [ChestSort, WorldGuard]
+depend: [Vault]
 commands:
   mycolony:
     description: main command

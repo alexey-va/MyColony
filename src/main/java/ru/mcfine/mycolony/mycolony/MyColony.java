@@ -1,8 +1,12 @@
 package ru.mcfine.mycolony.mycolony;
 
 import de.jeff_media.chestsort.api.ChestSortAPI;
+import net.milkbowl.vault.chat.Chat;
+import net.milkbowl.vault.economy.Economy;
+import net.milkbowl.vault.permission.Permission;
 import org.bukkit.Bukkit;
 import org.bukkit.plugin.PluginManager;
+import org.bukkit.plugin.RegisteredServiceProvider;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.scheduler.BukkitTask;
 import org.jetbrains.annotations.NotNull;
@@ -28,6 +32,9 @@ public final class MyColony extends JavaPlugin {
     public boolean chestSortAPI = false;
     public LandsAPIHook landsHook = null;
     public static ColonyProtection protection;
+    public static Economy econ = null;
+    public static Permission perms = null;
+    public static Chat chat = null;
 
     @Override
     public void onEnable() {
@@ -52,11 +59,45 @@ public final class MyColony extends JavaPlugin {
         if(Bukkit.getPluginManager().getPlugin("Lands") != null){
             this.landsHook  = new LandsAPIHook();
         }
+
+        if (!setupEconomy() ) {
+            getLogger().severe(String.format("[%s] - Disabled due to no Vault dependency found!", getDescription().getName()));
+            getServer().getPluginManager().disablePlugin(this);
+            return;
+        }
+        setupPermissions();
+        setupChat();
     }
 
     @Override
     public void onDisable() {
         jsonStorage.saveDataSync();
+    }
+
+    private boolean setupEconomy() {
+        if (getServer().getPluginManager().getPlugin("Vault") == null) {
+            return false;
+        }
+        RegisteredServiceProvider<Economy> rsp = getServer().getServicesManager().getRegistration(Economy.class);
+        if (rsp == null) {
+            return false;
+        }
+        econ = rsp.getProvider();
+        return true;
+    }
+
+    private boolean setupChat() {
+        RegisteredServiceProvider<Chat> rsp = getServer().getServicesManager().getRegistration(Chat.class);
+        assert rsp != null;
+        chat = rsp.getProvider();
+        return true;
+    }
+
+    private boolean setupPermissions() {
+        RegisteredServiceProvider<Permission> rsp = getServer().getServicesManager().getRegistration(Permission.class);
+        assert rsp != null;
+        perms = rsp.getProvider();
+        return true;
     }
 
     public static RegionManager getRegionManager() {

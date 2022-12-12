@@ -33,7 +33,7 @@ public class RegionType {
     private List<Requirement> reqs;
     private String shopGroup;
     private int shopAmount;
-    private List<String>
+    private List<UpgradeType> upgradeTypes = new ArrayList<>();
 
 
 

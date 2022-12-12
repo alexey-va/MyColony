@@ -126,6 +126,7 @@ public class RegionManager {
                 region = new Region(regionMock.playerNames, regionMock.level, regionMock.x, regionMock.y, regionMock.z,
                         regionMock.regionName, regionMock.worldName, regionMock.playerUUIDs, regionType, regionMock.uuid, regionMock.wgName);
             }
+            region.setTimeSinceCreation(regionMock.timeSinceCreation);
             //System.out.println(region);
             addRegion(location, region);
 

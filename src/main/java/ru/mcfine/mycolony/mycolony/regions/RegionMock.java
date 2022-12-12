@@ -29,6 +29,7 @@ public class RegionMock {
     // CITY
     public int population;
     public Set<String> members;
+    public double timeSinceCreation;
 
     public RegionMock(Region region){
         this.playerNames = region.getPlayerNames();
@@ -44,6 +45,7 @@ public class RegionMock {
         this.uuid = region.getUuid();
         this.bankDeposit = region.getBankDeposit();
         this.wgName = region.getWgRegionName();
+        this.timeSinceCreation = region.getTimeSinceCreation();
         if(region instanceof CityRegion cityRegion){
             if(cityRegion.getCityArea() instanceof SquareArea squareArea){
                 this.chunkRadius = squareArea.getChunkRadius();
