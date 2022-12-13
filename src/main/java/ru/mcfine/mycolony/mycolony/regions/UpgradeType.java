@@ -1,5 +1,7 @@
 package ru.mcfine.mycolony.mycolony.regions;
 
+import ru.mcfine.mycolony.mycolony.MyColony;
+import ru.mcfine.mycolony.mycolony.config.MyConfig;
 import ru.mcfine.mycolony.mycolony.regimes.Regime;
 
 import java.util.ArrayList;
@@ -10,6 +12,8 @@ public class UpgradeType {
 
     private String regionTypeName;
     private String regimeName;
+    private RegionType regionType;
+    private Regime regime;
     private List<UpgradeCondition> conditionList = new ArrayList<>();
     private int priority = 1;
     private boolean automatic = false;
@@ -23,7 +27,6 @@ public class UpgradeType {
     }
 
     public List<UpgradeCondition> getLackingConditions(Region region, String playerName) {
-        boolean can = true;
         List<UpgradeCondition> lack = new ArrayList<>();
         for (UpgradeCondition upgradeCondition : conditionList) {
             if (!upgradeCondition.satisfy(playerName, region.getWorldName(), region, region.getCityRegion())) {
@@ -31,6 +34,10 @@ public class UpgradeType {
             }
         }
         return lack;
+    }
+
+    public void initialize(){
+        if(this.regionTypeName != null) this.regionType = MyColony.plugin.config.getRegionType(this.regionTypeName);
     }
 
     public String getRegionTypeName() {
