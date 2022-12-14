@@ -31,25 +31,11 @@ public class Utils {
     private static HashMap<Player, BukkitTask> showRegionTasks = new HashMap<>();
     private static HashMap<Player, BukkitTask> showBlockingRegionTasks = new HashMap<>();
     public static ItemStack getBackground() {
-        ConfigurationSection section = MyColony.plugin.getConfig().getConfigurationSection("background-item");
-        Material material = null;
-        Component displayName = Component.text(" ");
-        int modelData = 0;
-        if (section != null) {
-            material = Material.matchMaterial(section.getString("material", "BLACK_STAINED_GLASS_PANE"));
-            displayName = mm.deserialize(section.getString("display-name", " "));
-            modelData = section.getInt("model-data", 0);
-        }
+        return getBackground(Material.BLACK_STAINED_GLASS_PANE);
+    }
 
-        if (material == null) material = Material.BLACK_STAINED_GLASS_PANE;
+    public static ItemStack getNextPage(Material material){
 
-        ItemStack bg = new ItemStack(material, 1);
-        ItemMeta meta = bg.getItemMeta();
-        meta.setCustomModelData(modelData);
-        meta.displayName(displayName);
-        bg.setItemMeta(meta);
-
-        return bg;
     }
 
     public static ItemStack getBackground(Material material) {

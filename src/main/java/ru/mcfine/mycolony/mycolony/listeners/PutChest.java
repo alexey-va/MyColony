@@ -129,9 +129,9 @@ public class PutChest implements Listener {
             BuildGui gui = new BuildGui(mats);
             gui.show(event.getPlayer());
             event.setCancelled(true);
-            return false;
+            return true;
         }
-        return true;
+        return false;
     }
 
     private void highlightBlock(Location location, ParticleEffect particleEffect){

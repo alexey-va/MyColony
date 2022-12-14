@@ -1,5 +1,6 @@
 package ru.mcfine.mycolony.mycolony.tasks;
 
+import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.Chunk;
 import org.bukkit.Color;
 import org.bukkit.Location;
@@ -7,6 +8,7 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.scheduler.BukkitRunnable;
 import ru.mcfine.mycolony.mycolony.MyColony;
+import ru.mcfine.mycolony.mycolony.config.Lang;
 import ru.mcfine.mycolony.mycolony.guis.BuildGui;
 import ru.mcfine.mycolony.mycolony.regions.GroupItem;
 import ru.mcfine.mycolony.mycolony.regions.Region;
@@ -41,7 +43,8 @@ public class TickerRunnable extends BukkitRunnable {
             ItemStack item = entry.getKey().clockItem.getItem();
             ItemMeta meta = item.getItemMeta();
             Region region = entry.getValue();
-            meta.setDisplayName(Color.ORANGE+"Next cycle in: "+ Color.GREEN+Math.ceil(region.getMaxTime() - region.getTimeElapsed())+"s");
+            Map<String, String> rep = Map.of("%time%", ""+(Math.ceil(region.getMaxTime() - region.getTimeElapsed())));
+            meta.displayName(Lang.get("region.time-to-next", rep));
             item.setItemMeta(meta);
             entry.getKey().update();
         }

@@ -10,6 +10,7 @@ import org.bukkit.Material;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 import ru.mcfine.mycolony.mycolony.MyColony;
+import ru.mcfine.mycolony.mycolony.config.Lang;
 import ru.mcfine.mycolony.mycolony.regions.RegionType;
 import ru.mcfine.mycolony.mycolony.shop.ShopGroup;
 import ru.mcfine.mycolony.mycolony.util.Utils;
@@ -44,10 +45,10 @@ public class ShopMenu extends ChestGui {
         for(ShopGroup shopGroup : MyColony.plugin.config.getShopGroups().values()){
             ItemStack itemStack = new ItemStack(shopGroup.getGroupIcon(), shopGroup.getGroupIconAmount());
             ItemMeta itemMeta = itemStack.getItemMeta();
-            itemMeta.displayName(Component.text(shopGroup.getGroupName()));
+            itemMeta.displayName(Lang.translateToComponent(shopGroup.getGroupName()));
             // TODO - replace string arraylist with component one in class
             List<Component> loreComponents = new ArrayList<>();
-            for(String s : shopGroup.getDescription()) loreComponents.add(Component.text(s));
+            for(String s : shopGroup.getDescription()) loreComponents.add(Lang.translateToComponent(s));
             itemMeta.lore(loreComponents);
             itemStack.setItemMeta(itemMeta);
             GuiItem guiItem = new GuiItem(itemStack, event -> {

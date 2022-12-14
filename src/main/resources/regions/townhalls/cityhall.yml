@@ -25,11 +25,10 @@ production:
       - log:5
       - iron_pickaxe:tool:1
     output:
-      - diamond
+      - 1000:money
     chance: 1.0
     period: 100
     priority: 1
 
 building-materials:
   primary: 10
-  cobblestone: 10

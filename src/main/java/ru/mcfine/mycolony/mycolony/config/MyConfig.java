@@ -121,6 +121,8 @@ public class MyConfig {
         List<ProductionEntry> productionEntries = parseProductionEntries(data.getConfigurationSection("production"));
         List<Requirement> requirementEntries = parseReqs(data.getConfigurationSection(""));
 
+        if(productionEntries != null) productionEntries.sort(Comparator.comparingInt(ProductionEntry::getPriority));
+
         RegionType regionType = new RegionType(productionEntries,
                 level, 1, 0, null, matList,
                 xRight, xLeft, zBackward, zForward, yDown, yUp, isCity, dynmapMarker,

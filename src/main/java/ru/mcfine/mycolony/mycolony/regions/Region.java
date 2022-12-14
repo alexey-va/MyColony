@@ -79,8 +79,8 @@ public class Region {
             this.timeElapsed = 0;
             if (this.regionType.getProductionEntries() != null) {
                 boolean success = false;
-                if (selectedChain == null) {
                     for (ProductionEntry productionEntry : this.regionType.getProductionEntries()) {
+                        if(selectedChain != null && !productionEntry.getName().equals(selectedChain)) continue;
                         //System.out.println(productionEntry);
                         var check = checkProductionConditions(productionEntry);
                         //System.out.println(check +" | "+check.getKey()+" | "+check.getValue().get(0));
@@ -92,7 +92,6 @@ public class Region {
                         success = true;
                         break;
                     }
-                }
             }
         }
     }
@@ -134,7 +133,13 @@ public class Region {
 
             List<ProductionItem> clear = new ArrayList<>();
             for (ProductionItem ct : input) {
-                if(ct.type == ProductionItem.Type.MONEY) continue;
+                if(ct.type == ProductionItem.Type.MONEY){
+                    if(ct.moneyAmount > this.bankDeposit){
+                        MyColony.plugin.getLogger().severe("For some reason region deposit is lower than it should be.");
+                    }
+                    this.setBankDeposit(this.getBankDeposit() - ct.moneyAmount);
+                    continue;
+                }
                 if (ct.hasMaterial(itemStack.getType())) {
                     if(ct.type == ProductionItem.Type.TOOL || ct.type == ProductionItem.Type.TOOL_GROUP){
                         ItemMeta meta = itemStack.getItemMeta();
@@ -232,7 +237,9 @@ public class Region {
             // Check if has mats
             List<ProductionItem> clear = new ArrayList<>();
             for (var in : input) {
-                if (in.hasMaterial(itemStack.getType())) {
+                if(in.type == ProductionItem.Type.MONEY){
+                    if(this.getBankDeposit() >= in.getMoneyAmount()) clear.add(in);
+                } else if (in.hasMaterial(itemStack.getType())) {
                     //System.out.println(in.type);
                     if (in.type == ProductionItem.Type.TOOL || in.type == ProductionItem.Type.TOOL_GROUP) {
                         ItemMeta meta = itemStack.getItemMeta();

@@ -13,6 +13,7 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.jetbrains.annotations.NotNull;
 import ru.mcfine.mycolony.mycolony.MyColony;
+import ru.mcfine.mycolony.mycolony.config.Lang;
 import ru.mcfine.mycolony.mycolony.regions.RegionType;
 import ru.mcfine.mycolony.mycolony.shop.ShopGroup;
 import ru.mcfine.mycolony.mycolony.util.Utils;
@@ -50,10 +51,10 @@ public class ShopGroupGui extends ChestGui {
             System.out.println("Region type: "+regionType);
             ItemStack itemStack = new ItemStack(regionType.getShopIcon(), regionType.getShopAmount());
             ItemMeta itemMeta = itemStack.getItemMeta();
-            itemMeta.displayName(Component.text(regionType.getDisplayName()));
+            itemMeta.displayName(Lang.translateToComponent(regionType.getDisplayName()));
             List<Component> descr = new ArrayList<>();
-            descr.add(Component.text("Level: "+regionType.getLevel()));
-            descr.add(Component.text("Cost: "+regionType.getPrice()));
+            descr.add(Lang.translateToComponent("Level: "+regionType.getLevel()));
+            descr.add(Lang.translateToComponent("Cost: "+regionType.getPrice()));
             itemMeta.lore(descr);
             itemStack.setItemMeta(itemMeta);
             GuiItem guiItem = new GuiItem(itemStack, inventoryClickEvent -> {
@@ -67,6 +68,7 @@ public class ShopGroupGui extends ChestGui {
         this.addPane(shopPane);
 
         StaticPane navigation = new StaticPane(0, invRows-1, 9, 1, Pane.Priority.HIGH);
+        ItemStack
         GuiItem prev = new GuiItem(new ItemStack(Material.RED_WOOL), inventoryClickEvent -> {
             if(shopPane.getPage() == 0){
                 parentMenu.show(inventoryClickEvent.getWhoClicked());
