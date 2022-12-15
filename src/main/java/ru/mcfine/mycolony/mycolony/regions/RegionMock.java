@@ -27,9 +27,9 @@ public class RegionMock {
     public int chunkRadius = -1;
 
     // CITY
-    public int population;
     public Set<String> members;
     public double timeSinceCreation;
+    public String ownerName;
 
     public RegionMock(Region region){
         this.playerNames = region.getPlayerNames();
@@ -52,8 +52,8 @@ public class RegionMock {
             }
 
             this.members = cityRegion.getCityMembers();
-            this.population = cityRegion.getCityPopulation();
             this.cityWgName= cityRegion.getCityWgName();
+            this.ownerName = cityRegion.getOwnerName();
         }
     }
 }

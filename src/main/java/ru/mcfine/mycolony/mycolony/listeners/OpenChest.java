@@ -20,8 +20,8 @@ public class OpenChest implements Listener {
         Region region = MyColony.regionManager.getRegion(block.getLocation());
         if(region == null) return;
         event.setCancelled(true);
-        RegionGui gui = new RegionGui(block, region);
-        TickerRunnable.mainMenuGuis.put(gui, region);
+        if(!region.canOpen(event.getPlayer())) return;
+        RegionGui gui = new RegionGui(block, region, event.getPlayer());
         gui.show(event.getPlayer());
 
     }

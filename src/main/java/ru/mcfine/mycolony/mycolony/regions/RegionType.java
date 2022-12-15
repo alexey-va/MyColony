@@ -38,6 +38,7 @@ public class RegionType {
 
 
     private int baseChunkRadius;
+    private boolean absolutePower=false;
 
 
     public RegionType(List<ProductionEntry> productionEntries, int level, int cityLevelForUpgrade, double income,
@@ -76,7 +77,7 @@ public class RegionType {
                       ArrayList<RegionType> upgrades, ArrayList<BuildingMaterial> buildingMaterials, int xRight, int xLeft,
                       int zBackward, int zForward, int yDown, int yUp, boolean isCity, Material dynmapMarker,
                       Material shopIcon, double price, String displayName, boolean enabled, List<Requirement> reqs, String shopGroup,
-                      int shopAmount, String regionId ,int chunkRadius) {
+                      int shopAmount, String regionId ,int chunkRadius, boolean absolutePower) {
 
         if(productionEntries != null) this.productionEntries = productionEntries.stream().
                 sorted(Comparator.comparingInt(ProductionEntry::getPriority)).collect(Collectors.toList());
@@ -105,6 +106,7 @@ public class RegionType {
         this.regionId = regionId;
 
         this.baseChunkRadius = chunkRadius;
+        this.absolutePower=absolutePower;
     }
 
 
@@ -278,6 +280,14 @@ public class RegionType {
 
     public String getRegionId() {
         return regionId;
+    }
+
+    public List<UpgradeType> getUpgradeTypes() {
+        return upgradeTypes;
+    }
+
+    public boolean isAbsolutePower() {
+        return absolutePower;
     }
 }
 

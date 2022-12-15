@@ -7,6 +7,7 @@ import com.github.stefvanschie.inventoryframework.pane.PaginatedPane;
 import com.github.stefvanschie.inventoryframework.pane.Pane;
 import net.kyori.adventure.text.Component;
 import org.bukkit.Material;
+import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 import ru.mcfine.mycolony.mycolony.MyColony;
@@ -23,8 +24,8 @@ public class ShopMenu extends ChestGui {
     private int rows = 3;
     private List<GuiItem> guiItemList = new ArrayList<>();
 
-    public ShopMenu() {
-        super(3, "Shop");
+    public ShopMenu(Player p) {
+        super(3, Lang.getString("shop.title", p));
         this.setRows(rows);
 
         OutlinePane background = new OutlinePane(0,0,9,rows, Pane.Priority.LOWEST);
@@ -36,7 +37,7 @@ public class ShopMenu extends ChestGui {
 
         if(rows - 2 > 0) {
             OutlinePane background2 = new OutlinePane(1, 1, 7, rows - 2, Pane.Priority.LOW);
-            background2.addItem(new GuiItem(new ItemStack(Material.GRAY_STAINED_GLASS_PANE), event -> event.setCancelled(true)));
+            background2.addItem(new GuiItem(Utils.getBackground(Material.GRAY_STAINED_GLASS_PANE), event -> event.setCancelled(true)));
             background2.setRepeat(true);
             this.addPane(background2);
         }
@@ -45,15 +46,12 @@ public class ShopMenu extends ChestGui {
         for(ShopGroup shopGroup : MyColony.plugin.config.getShopGroups().values()){
             ItemStack itemStack = new ItemStack(shopGroup.getGroupIcon(), shopGroup.getGroupIconAmount());
             ItemMeta itemMeta = itemStack.getItemMeta();
-            itemMeta.displayName(Lang.translateToComponent(shopGroup.getGroupName()));
-            // TODO - replace string arraylist with component one in class
-            List<Component> loreComponents = new ArrayList<>();
-            for(String s : shopGroup.getDescription()) loreComponents.add(Lang.translateToComponent(s));
-            itemMeta.lore(loreComponents);
+            itemMeta.setDisplayName(Lang.translate(shopGroup.getGroupName()));
+            itemMeta.setLore(shopGroup.getDescription());
             itemStack.setItemMeta(itemMeta);
             GuiItem guiItem = new GuiItem(itemStack, event -> {
                 event.setCancelled(true);
-                ShopGroupGui shopGroupGui = new ShopGroupGui(shopGroup, this);
+                ShopGroupGui shopGroupGui = new ShopGroupGui(shopGroup, this, p);
                 shopGroupGui.show(event.getWhoClicked());
             });
             guiItemList.add(guiItem);

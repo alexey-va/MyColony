@@ -162,13 +162,14 @@ public abstract class CityArea {
     }
 
     public static CityArea getAreaForCity(RegionType regionType, Location location){
-        if(MyColony.plugin.getConfig().getBoolean("use-lands", false)){
-
+        if(!regionType.isCity()) return null;
+        if(MyColony.plugin.useLands){
+            System.out.println(MyColony.plugin.landsHook.getLand(location));
+            if(MyColony.plugin.landsHook.getLand(location) == null) return null;
+            return new LandsArea(location);
         } else{
-            if(!regionType.isCity()) return null;
             return new SquareArea(regionType.getBaseChunkRadius(), location.getWorld().getName(), location.getBlockX(), location.getBlockY(), location.getBlockZ());
         }
-        return null;
     }
 
     public static void clearCityBordersVis(Player player){

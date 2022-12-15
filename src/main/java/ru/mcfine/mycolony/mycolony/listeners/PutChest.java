@@ -20,7 +20,6 @@ import ru.mcfine.mycolony.mycolony.MyColony;
 import ru.mcfine.mycolony.mycolony.city.CityArea;
 import ru.mcfine.mycolony.mycolony.city.CityRegion;
 import ru.mcfine.mycolony.mycolony.city.SquareArea;
-import ru.mcfine.mycolony.mycolony.compat.ColonyProtection;
 import ru.mcfine.mycolony.mycolony.config.Lang;
 import ru.mcfine.mycolony.mycolony.guis.BuildGui;
 import ru.mcfine.mycolony.mycolony.regions.*;
@@ -63,6 +62,13 @@ public class PutChest implements Listener {
             createCooldownTask();
         }
 
+        CityRegion cityRegion = RegionManager.getCityByLocation(event.getBlockPlaced().getLocation());
+        if(cityRegion != null && !cityRegion.cityHasPlayer(event.getPlayer().getName())){
+            event.getPlayer().sendMessage("Not part of the city!");
+            event.setCancelled(true);
+            return;
+        }
+
         List<Requirement> reqs = regionType.getReqs();
         List<Requirement> notSatisfy = new ArrayList<>();
         if (reqs != null && reqs.size() > 0) {
@@ -89,6 +95,10 @@ public class PutChest implements Listener {
                     event.setCancelled(true);
                     return;
                 }
+            } else{
+                event.getPlayer().sendMessage("No area for city");
+                event.setCancelled(true);
+                return;
             }
         }
 
@@ -126,7 +136,7 @@ public class PutChest implements Listener {
     private boolean checkBuildingMaterials(BlockPlaceEvent event, RegionType regionType, Pair<Location, Location> corners, Location location){
         List<BuildingMaterial> mats = Utils.locationSatisfyBlocks(corners, location, regionType);
         if (mats.size() > 0) {
-            BuildGui gui = new BuildGui(mats);
+            BuildGui gui = new BuildGui(mats, event.getPlayer());
             gui.show(event.getPlayer());
             event.setCancelled(true);
             return true;
@@ -143,11 +153,12 @@ public class PutChest implements Listener {
     }
 
     private void saveChanges(Player player){
-        player.sendMessage(Lang.get("region.region-placed"));
+        player.sendMessage(Lang.getString("region.region-placed", player));
         new BukkitRunnable() {
             @Override
             public void run() {
-                MyColony.plugin.getJsonStorage().saveDataSync();
+                MyColony.plugin.getJsonStorage().saveRegions();
+                MyColony.plugin.getJsonStorage().savePlayers();
             }
         }.runTaskAsynchronously(MyColony.plugin);
     }
@@ -162,7 +173,7 @@ public class PutChest implements Listener {
         String regionName = regionType.getRegionId();
 
         if (regionType.isCity()) {
-            if (MyColony.protection.ifIntersects(corners, event.getPlayer(), 10, true, null)) {
+            if (MyColony.protection.ifIntersects(corners, event.getPlayer(), 10)) {
                 event.getPlayer().sendMessage("WG intersects");
                 event.setCancelled(true);
                 return;
@@ -171,7 +182,7 @@ public class PutChest implements Listener {
             CityArea cityArea = CityArea.getAreaForCity(regionType, event.getBlockPlaced().getLocation());
 
             if (cityArea instanceof SquareArea squareArea) {
-                if (MyColony.protection.ifIntersects(squareArea, event.getPlayer(), 20, true, null)) {
+                if (MyColony.protection.ifIntersects(squareArea, event.getPlayer(), 20)) {
                     event.getPlayer().sendMessage("WG intersects");
                     event.setCancelled(true);
                     return;
@@ -180,7 +191,7 @@ public class PutChest implements Listener {
 
             String protName = regionName + "_" + event.getPlayer().getName() + "_";
             for (int i = 1; i < 100; i++) {
-                if (!MyColony.protection.ifRegionExist(protName + i, event.getBlockPlaced().getWorld())) {
+                if (!MyColony.protection.ifAreaExists(protName + i, event.getBlockPlaced().getWorld())) {
                     protName += i;
                     break;
                 }
@@ -189,22 +200,22 @@ public class PutChest implements Listener {
             Set<String> members = new HashSet<>();
             members.add(event.getPlayer().getName());
 
-            MyColony.protection.addRegion(corners, event.getPlayer(), protName, 20, playerNames, playerNames);
+            MyColony.protection.addRegion(corners, event.getPlayer(), protName, 20, playerNames, new HashSet<>());
 
             String cityProtName = event.getPlayer().getName() + "_city_";
             for (int i = 1; i < 100; i++) {
-                if (!MyColony.protection.ifRegionExist(cityProtName + i, event.getBlockPlaced().getWorld())) {
+                if (!MyColony.protection.ifAreaExists(cityProtName + i, event.getBlockPlaced().getWorld())) {
                     cityProtName += i;
                     break;
                 }
             }
 
-            MyColony.protection.createCityRegion(cityArea, cityProtName, 10, playerNames, playerNames);
+            if(cityArea instanceof SquareArea) MyColony.protection.createCityArea(cityArea, cityProtName, 10, playerNames, playerNames);
 
             region = new CityRegion(playerNames, 1, block.getX(), block.getY(), block.getZ(),
-                    regionName, block.getWorld().getName(), playerUUIDs, regionType, null, protName, cityArea, members, 1, cityProtName);
+                    regionName, block.getWorld().getName(), playerUUIDs, regionType, null, protName, cityArea, members, cityProtName, event.getPlayer().getName());
         } else {
-            if (MyColony.protection.ifIntersects(corners, event.getPlayer(), 20, false, null)) {
+            if (MyColony.protection.ifIntersects(corners, event.getPlayer(), 20)) {
                 event.getPlayer().sendMessage("WG intersects");
                 event.setCancelled(true);
                 return;
@@ -212,16 +223,16 @@ public class PutChest implements Listener {
 
             String protName = regionName + "_" + event.getPlayer().getName() + "_";
             for (int i = 1; i < 100; i++) {
-                if (!MyColony.protection.ifRegionExist(protName + i, event.getBlockPlaced().getWorld())) {
+                if (!MyColony.protection.ifAreaExists(protName + i, event.getBlockPlaced().getWorld())) {
                     protName += i;
                     break;
                 }
             }
 
-            MyColony.protection.addRegion(corners, event.getPlayer(), protName, 20, playerNames, playerNames);
+            MyColony.protection.addRegion(corners, event.getPlayer(), protName, 20, playerNames, new HashSet<>());
 
             region = new Region(playerNames, 1, block.getX(), block.getY(), block.getZ(),
-                    regionName, block.getWorld().getName(), playerUUIDs, regionType, null, protName);
+                    regionName, block.getWorld().getName(), playerUUIDs, regionType, null, protName, RegionManager.getCityByLocation(event.getBlockPlaced().getLocation()));
         }
 
         MyColony.regionManager.addRegion(block.getLocation(), region);

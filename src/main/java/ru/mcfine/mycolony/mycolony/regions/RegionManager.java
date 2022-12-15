@@ -7,18 +7,21 @@ import org.bukkit.persistence.PersistentDataType;
 import ru.mcfine.mycolony.mycolony.MyColony;
 import ru.mcfine.mycolony.mycolony.city.CityArea;
 import ru.mcfine.mycolony.mycolony.city.CityRegion;
+import ru.mcfine.mycolony.mycolony.city.LandsArea;
 import ru.mcfine.mycolony.mycolony.city.SquareArea;
 import ru.mcfine.mycolony.mycolony.players.ColonyPlayer;
+import ru.mcfine.mycolony.mycolony.players.PlayerMock;
 
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 public class RegionManager {
 
 
-    private HashMap<Chunk, HashMap<Location,Region>> regionMap = new HashMap<>();
-    public static HashMap<String, ColonyPlayer> colonyPlayers = new HashMap<>();
+    private Map<Chunk, HashMap<Location,Region>> regionMap = new HashMap<>();
+    public static Map<String, ColonyPlayer> colonyPlayers = new HashMap<>();
     public static List<CityRegion> cityRegions = new ArrayList<>();
     public RegionManager(HashMap<Chunk, HashMap<Location, Region>> regionMap) {
         this.regionMap = regionMap;
@@ -78,7 +81,7 @@ public class RegionManager {
         container.clear();
     }
 
-    public HashMap<Chunk, HashMap<Location, Region>> getRegionMap() {
+    public Map<Chunk, HashMap<Location, Region>> getRegionMap() {
         return regionMap;
     }
 
@@ -115,22 +118,37 @@ public class RegionManager {
             if(regionType.isCity()){
 
                 CityArea cityArea = null;
-                if(regionMock.chunkRadius != -1){
+                if(regionMock.chunkRadius != -1 && !MyColony.plugin.useLands){
                     cityArea = new SquareArea(regionMock.chunkRadius, regionMock.worldName, regionMock.x, regionMock.y, regionMock.z);
+                } else{
+                    cityArea = new LandsArea(location);
+                    System.out.println(cityArea);
                 }
 
                 region = new CityRegion(regionMock.playerNames, regionMock.level, regionMock.x, regionMock.y, regionMock.z,
                         regionMock.regionName, regionMock.worldName, regionMock.playerUUIDs, regionType, regionMock.uuid, regionMock.wgName,
-                        cityArea, regionMock.members, regionMock.population, regionMock.cityWgName);
+                        cityArea, regionMock.members, regionMock.cityWgName, regionMock.ownerName);
             } else{
                 region = new Region(regionMock.playerNames, regionMock.level, regionMock.x, regionMock.y, regionMock.z,
-                        regionMock.regionName, regionMock.worldName, regionMock.playerUUIDs, regionType, regionMock.uuid, regionMock.wgName);
+                        regionMock.regionName, regionMock.worldName, regionMock.playerUUIDs, regionType, regionMock.uuid, regionMock.wgName, null);
             }
             region.setTimeSinceCreation(regionMock.timeSinceCreation);
-            //System.out.println(region);
+            region.setBankDeposit(regionMock.bankDeposit);
             addRegion(location, region);
 
         }
+        for(Region region : getAllRegions()){
+            CityRegion cityRegion = RegionManager.getCityByLocation(region.getLocation());
+            region.setCityRegion(cityRegion);
+        }
+    }
+
+    public List<PlayerMock> getPlayerMock(){
+        List<PlayerMock> playerMocks = new ArrayList<>();
+        for(var temp : colonyPlayers.values()){
+            playerMocks.add(new PlayerMock(temp));
+        }
+        return playerMocks;
     }
 
     public ArrayList<RegionMock> getRegionsMock(){
@@ -142,6 +160,15 @@ public class RegionManager {
             }
         }
         return mockList;
+    }
+
+    public List<Region> getAllRegions(){
+        List<Region> regions = new ArrayList<>();
+        for(var hashMap : regionMap.values()){
+            if(hashMap == null) continue;
+            regions.addAll(hashMap.values());
+        }
+        return regions;
     }
 
     public static CityRegion getCityByLocation(Location location){
@@ -157,9 +184,11 @@ public class RegionManager {
 
     public static List<CityRegion> getCityRegions(){ return cityRegions;}
 
-    public void uploadPlayers(Object fromJson) {
-
-
-
+    public void uploadPlayers(List<PlayerMock> fromJson) {
+        if(fromJson == null) return;
+        for(PlayerMock playerMock : fromJson){
+            ColonyPlayer colonyPlayer = new ColonyPlayer(playerMock);
+            colonyPlayers.put(colonyPlayer.getPlayerName(), colonyPlayer);
+        }
     }
 }

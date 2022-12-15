@@ -3,7 +3,7 @@ version: '${project.version}'
 main: ru.mcfine.mycolony.mycolony.MyColony
 api-version: 1.19
 load: POSTWORLD
-softdepend: [ChestSort, WorldGuard]
+softdepend: [ChestSort, WorldGuard, PlaceholderAPI, Lands]
 depend: [Vault]
 commands:
   mycolony:

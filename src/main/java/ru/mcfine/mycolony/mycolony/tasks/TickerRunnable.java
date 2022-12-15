@@ -30,7 +30,7 @@ public class TickerRunnable extends BukkitRunnable {
 
     @Override
     public void run() {
-        HashMap<Chunk, HashMap<Location, Region>> regions = MyColony.regionManager.getRegionMap();
+        Map<Chunk, HashMap<Location, Region>> regions = MyColony.regionManager.getRegionMap();
         for(Map.Entry<Chunk, HashMap<Location, Region>> entry : regions.entrySet()){
             if(entry == null|| entry.getValue() == null || entry.getKey() == null || !entry.getKey().isLoaded()) continue;
             for(Region region : entry.getValue().values()){
@@ -44,7 +44,7 @@ public class TickerRunnable extends BukkitRunnable {
             ItemMeta meta = item.getItemMeta();
             Region region = entry.getValue();
             Map<String, String> rep = Map.of("%time%", ""+(Math.ceil(region.getMaxTime() - region.getTimeElapsed())));
-            meta.displayName(Lang.get("region.time-to-next", rep));
+            meta.setDisplayName(Lang.getString("menu.time-to-next-display", rep, entry.getKey().p));
             item.setItemMeta(meta);
             entry.getKey().update();
         }

@@ -2,7 +2,6 @@ package ru.mcfine.mycolony.mycolony.regions;
 
 import de.jeff_media.chestsort.api.ChestSortAPI;
 import javafx.util.Pair;
-import net.kyori.adventure.text.minimessage.MiniMessage;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -46,10 +45,8 @@ public class Region {
     private String wgRegionName = null;
     private double timeSinceCreation = 0;
 
-    private static MiniMessage mm = MiniMessage.miniMessage();
 
-
-    public Region(Set<String> playerNames, int level, int x, int y, int z, String regionName, String worldName, Set<String> playerUUIDs, RegionType regionType, String uuid, String wgRegionName) {
+    public Region(Set<String> playerNames, int level, int x, int y, int z, String regionName, String worldName, Set<String> playerUUIDs, RegionType regionType, String uuid, String wgRegionName, CityRegion cityRegion) {
         this.regionName = regionName;
         this.playerNames = playerNames;
         this.level = level;
@@ -66,6 +63,7 @@ public class Region {
         this.location = new Location(Bukkit.getWorld(worldName), x, y, z);
         this.blockFace = ((Directional) location.getBlock().getBlockData()).getFacing();
         this.corners = Utils.getRegionCorners(location, blockFace, regionType);
+        this.cityRegion = cityRegion;
     }
 
     public void incrementTime(double inc) {
@@ -108,11 +106,11 @@ public class Region {
         }
         if (players.size() == 0) return;
         if (reasonId == 0) {
-            players.forEach(player -> player.sendMessage(Lang.get("notify.not-enough-slots")));
+            players.forEach(player -> player.sendMessage(Lang.getString("notify.not-enough-slots", player)));
         } else if (reasonId == 1) {
-            players.forEach(player -> player.sendMessage(Lang.get("notify.not-enough-materials")));
+            players.forEach(player -> player.sendMessage(Lang.getString("notify.not-enough-materials", player)));
         } else if (reasonId == 2) {
-            players.forEach(player -> player.sendMessage(Lang.get("notify.region-produced")));
+            players.forEach(player -> player.sendMessage(Lang.getString("notify.region-produced", player)));
         }
     }
 
@@ -187,7 +185,7 @@ public class Region {
         for (ProductionItem output : prod.getOutput()) {
             //System.out.println(output.material +" |out "+output.amount);
             if (output.type == ProductionItem.Type.MONEY) {
-                this.bankDeposit += output.amount;
+                this.setBankDeposit(this.getBankDeposit()+output.moneyAmount);
             } else {
                 int amount = output.amount;
                 while (amount > 0) {
@@ -308,6 +306,16 @@ public class Region {
         }
 
         return new Pair<>(fits, input);
+    }
+
+    public boolean canDestroy(Player player){
+        if(playerNames.contains(player.getName())) return true;
+        return getCityRegion() != null && getCityRegion().getOwnerName().equals(player.getName()) && getCityRegion().getRegionType().isAbsolutePower();
+    }
+
+    public boolean canOpen(Player player){
+        if(playerNames.contains(player.getName())) return true;
+        return getCityRegion() != null && getCityRegion().getOwnerName().equals(player.getName()) && getCityRegion().getRegionType().isAbsolutePower();
     }
 
     public String getRegionName() {
@@ -433,14 +441,15 @@ public class Region {
     public CityRegion getCityRegion() {
         return cityRegion;
     }
+    public void addMember(String name, String uuid){
+        this.playerNames.add(name);
+        this.playerUUIDs.add(uuid);
+    }
 
     public BlockFace getBlockFace() {
         return blockFace;
     }
 
-    public static MiniMessage getMm() {
-        return mm;
-    }
 
     public String getWgRegionName() {
         return wgRegionName;
@@ -452,5 +461,13 @@ public class Region {
 
     public void setTimeSinceCreation(double timeSinceCreation) {
         this.timeSinceCreation = timeSinceCreation;
+    }
+
+    public void setCityRegion(CityRegion cityRegion) {
+        this.cityRegion = cityRegion;
+    }
+
+    public boolean hasPlayer(String name) {
+        return playerNames.contains(name);
     }
 }

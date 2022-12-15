@@ -1,6 +1,8 @@
 package ru.mcfine.mycolony.mycolony.shop;
 
+import net.kyori.adventure.text.Component;
 import org.bukkit.Material;
+import ru.mcfine.mycolony.mycolony.config.Lang;
 import ru.mcfine.mycolony.mycolony.regions.RegionType;
 
 import java.util.ArrayList;
@@ -14,7 +16,7 @@ public class ShopGroup {
     private Material groupIcon;
     private int groupIconAmount;
     private String permission;
-    private List<String> description;
+    private List<String> description = new ArrayList<>();
     private int prioroty;
     private Set<RegionType> regionTypes = new HashSet<>();
 
@@ -25,7 +27,9 @@ public class ShopGroup {
         this.groupIcon = groupIcon;
         this.groupIconAmount = groupIconAmount;
         this.permission = permission;
-        this.description = description;
+        for(String s : description){
+            this.description.add(Lang.translate(s));
+        }
         this.prioroty = prioroty;
     }
 
@@ -73,9 +77,6 @@ public class ShopGroup {
         return description;
     }
 
-    public void setDescription(List<String> description) {
-        this.description = description;
-    }
 
     public int getPrioroty() {
         return prioroty;
@@ -84,4 +85,5 @@ public class ShopGroup {
     public void setPrioroty(int prioroty) {
         this.prioroty = prioroty;
     }
+
 }

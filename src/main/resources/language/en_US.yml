@@ -1,2 +1,67 @@
 region:
-  townhall_1_name: "<gold>Town Hall <gray>(1)"
+  region-placed: '&6Region placed successfully!'
+shop:
+  title: Shop
+  lore:
+    - '&eLeveL: &7%level%'
+    - '&eCost: &7%cost%'
+groups:
+  log-display-name: '&7Logs'
+notify:
+  region-produced: '&7Region finished produciton.'
+common:
+  word-yes: "&aYes"
+  word-no: "&cNo"
+  word-none: "&cNone"
+menu:
+  chest-inventory-display: '&6Region inventory'
+  chest-inventory-lore: '&7Open region inventory'
+  time-to-next-lore: '&7Time to next production cycle'
+  time-to-next-display: '&6Next production: &7%time% s'
+  info-display: '&6Info about the region'
+  info-lore:
+    - '&eSelected group: &7%produced_group%'
+    - '&eBalance: &7%balance%'
+    - '&eLevel: &7%level%'
+    - '&eIs in city: &7%is_in_city%'
+    - '&eCity owner: &7%owner_name%'
+  bank-display: '&6Bank'
+  bank-lore: '&7Open bank menu'
+  bank:
+    title: '&8Bank'
+    add-display: '&6Deposit money'
+    add-lore: '&7Add money to account'
+    anvil-title: '&8Deposit money'
+    anvil-item-display-deposit: '&a1000'
+    anvil-item-lore-deposit:
+      - '&7Amount of money to deposit'
+      - '&7Click on item to deposit'
+    not-enough-money: '&4Not enough money!'
+    wrong-number: '&4It is not a number!'
+    take-display: '&6Withdraw money'
+    take-lore: '&7Take money from account'
+    anvil-title-deposit: '&8&lDeposit money'
+    anvil-title-withdraw: '&8&lWithdraw money'
+    anvil-item-display-withdraw: '&a1000'
+    anvil-item-lore-withdraw:
+      - '&7Amount of money to withdraw'
+      - '&7Click on item to withdraw'
+    bank-info-display: '&6Bank information'
+    bank-info-lore:
+      - '&eBalance: &a%balance%'
+  city-info-lore:
+    - '&eSelected group: &7%produced_group%'
+    - '&eBalance: &7%balance%'
+    - '&eLevel: &7%level%'
+    - '&ePopulation: &7%population%'
+    - '&eChunks: &7%chunk_amount%'
+    - '&eOwner: &7%owner_name%'
+  members-display: '&6Members'
+  members-lore: '&7List members of the region'
+  region-members:
+    title: '&8&lMembers'
+    head-display: '&6%name%'
+    head-lore: '&7Member of this region'
+  go-back-button-display: '&8Go back'
+  member-action:
+    title: '&8Member management'

@@ -7,6 +7,7 @@ import com.github.stefvanschie.inventoryframework.pane.PaginatedPane;
 import com.github.stefvanschie.inventoryframework.pane.Pane;
 import com.github.stefvanschie.inventoryframework.pane.StaticPane;
 import org.bukkit.Material;
+import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.jetbrains.annotations.NotNull;
 import ru.mcfine.mycolony.mycolony.production.ProductionEntry;
@@ -23,7 +24,7 @@ public class ShopItemGui extends ChestGui {
     private List<StaticPane> entriesPanes = new ArrayList<>();
     private PaginatedPane prod;
     private List<GroupItem> groupItems = new ArrayList<>();
-    public ShopItemGui(RegionType regionType, ShopGroupGui parentMenu) {
+    public ShopItemGui(RegionType regionType, ShopGroupGui parentMenu, Player p) {
         super(6, regionType.getDisplayName());
         this.parentMenu = parentMenu;
 
@@ -51,7 +52,7 @@ public class ShopItemGui extends ChestGui {
             staticPane.addItem(separatorItem, 3, 2);
             int coordinate = 0;
             for(ProductionItem item : entry.getInput()){
-                GroupItem groupItem = new GroupItem(item, item.getAmount(), this, groupItems);
+                GroupItem groupItem = new GroupItem(item, item.getAmount(), this, groupItems, p);
                 GuiItem inputItem = groupItem.getGuiItem();
                 staticPane.addItem(inputItem, (coordinate%3), (coordinate/3));
                 groupItems.add(groupItem);
@@ -59,7 +60,7 @@ public class ShopItemGui extends ChestGui {
             }
             coordinate = 0;
             for(ProductionItem item : entry.getOutput()){
-                GroupItem groupItem = new GroupItem(item, item.getAmount(), this, groupItems);
+                GroupItem groupItem = new GroupItem(item, item.getAmount(), this, groupItems, p);
                 GuiItem outputItem = groupItem.getGuiItem();
                 staticPane.addItem(outputItem, (coordinate%3 + 4), (coordinate/3));
                 groupItems.add(groupItem);
@@ -71,7 +72,7 @@ public class ShopItemGui extends ChestGui {
         this.addPane(prod);
 
         StaticPane navigation = new StaticPane(0, 5, 9, 1, Pane.Priority.HIGH);
-        GuiItem back = new GuiItem(new ItemStack(Material.RED_WOOL), inventoryClickEvent -> {
+        GuiItem back = new GuiItem(Utils.getPrevPage(Material.ARROW), inventoryClickEvent -> {
            if(prod.getPage() == 0){
                parentMenu.show(inventoryClickEvent.getWhoClicked());
            } else{
@@ -83,7 +84,7 @@ public class ShopItemGui extends ChestGui {
         navigation.addItem(back, 0, 0);
 
         if(prod.getPages() > 1) {
-            GuiItem next = new GuiItem(new ItemStack(Material.GREEN_WOOL), inventoryClickEvent -> {
+            GuiItem next = new GuiItem(Utils.getNextPage(Material.ARROW), inventoryClickEvent -> {
                 if (prod.getPage() == prod.getPages() - 1) {
                     prod.setPage(0);
                 } else {

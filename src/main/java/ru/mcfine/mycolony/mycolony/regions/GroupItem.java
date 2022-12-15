@@ -4,6 +4,7 @@ import com.github.stefvanschie.inventoryframework.gui.GuiItem;
 import com.github.stefvanschie.inventoryframework.gui.type.util.Gui;
 import net.kyori.adventure.text.Component;
 import org.bukkit.Material;
+import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 import ru.mcfine.mycolony.mycolony.config.Lang;
@@ -25,7 +26,7 @@ public class GroupItem {
     private final Gui parent;
     private List<GroupItem> groupItems;
 
-    public GroupItem(BuildingMaterial buildingMaterial, int amount, Gui parent, List<GroupItem> groupItems) {
+    public GroupItem(BuildingMaterial buildingMaterial, int amount, Gui parent, List<GroupItem> groupItems, Player p) {
         this.parent = parent;
         this.groupItems = groupItems;
         groupName = buildingMaterial.getGroupName();
@@ -41,10 +42,10 @@ public class GroupItem {
             Material material = matGroup.get(0);
             itemStack = new ItemStack(material, amount);
             ItemMeta meta = itemStack.getItemMeta();
-            meta.displayName(Lang.get("groups." + groupName + "-display-name"));
+            meta.setDisplayName(Lang.getString("groups." + groupName + "-display-name", p));
             itemStack.setItemMeta(meta);
             this.guiItem = new GuiItem(itemStack, event -> {
-                MaterialGroupGui materialGroupGui = new MaterialGroupGui(groupName, this.parent, groupItems);
+                MaterialGroupGui materialGroupGui = new MaterialGroupGui(groupName, this.parent, groupItems, p);
                 materialGroupGui.show(event.getWhoClicked());
             });
         }
@@ -54,7 +55,7 @@ public class GroupItem {
 
     }
 
-    public GroupItem(ProductionItem productionItem, int amount, Gui parent, List<GroupItem> groupItems){
+    public GroupItem(ProductionItem productionItem, int amount, Gui parent, List<GroupItem> groupItems,Player p){
         this.parent = parent;
         groupName = productionItem.getGroupName();
         ItemStack itemStack;
@@ -69,17 +70,17 @@ public class GroupItem {
             Material material = matGroup.get(0);
             itemStack = new ItemStack(material, amount);
             ItemMeta meta = itemStack.getItemMeta();
-            meta.displayName(Lang.get("groups." + groupName + "-display-name"));
+            meta.setDisplayName(Lang.getString("groups." + groupName + "-display-name", p));
             itemStack.setItemMeta(meta);
             this.guiItem = new GuiItem(itemStack, event -> {
-                MaterialGroupGui materialGroupGui = new MaterialGroupGui(groupName, this.parent, groupItems);
+                MaterialGroupGui materialGroupGui = new MaterialGroupGui(groupName, this.parent, groupItems, p);
                 materialGroupGui.show(event.getWhoClicked());
             });
         } else if(productionItem.getMoneyAmount() > 0.0){
             isMoney = true;
             itemStack = new ItemStack(Material.GOLD_INGOT, 1);
             ItemMeta itemMeta = itemStack.getItemMeta();
-            itemMeta.displayName(Component.text("Money: "+productionItem.getMoneyAmount()));
+            itemMeta.setDisplayName("Money: "+productionItem.getMoneyAmount());
             itemStack.setItemMeta(itemMeta);
             this.guiItem = new GuiItem(itemStack, inventoryClickEvent -> inventoryClickEvent.setCancelled(true));
         }

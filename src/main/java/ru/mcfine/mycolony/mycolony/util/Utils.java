@@ -1,12 +1,7 @@
 package ru.mcfine.mycolony.mycolony.util;
 
 import javafx.util.Pair;
-import net.kyori.adventure.text.Component;
-import net.kyori.adventure.text.minimessage.MiniMessage;
-import org.bukkit.Chunk;
-import org.bukkit.Location;
-import org.bukkit.Material;
-import org.bukkit.World;
+import org.bukkit.*;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
 import org.bukkit.configuration.ConfigurationSection;
@@ -17,6 +12,7 @@ import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.scheduler.BukkitTask;
 import org.bukkit.util.Vector;
 import ru.mcfine.mycolony.mycolony.MyColony;
+import ru.mcfine.mycolony.mycolony.config.Lang;
 import ru.mcfine.mycolony.mycolony.regions.BuildingMaterial;
 import ru.mcfine.mycolony.mycolony.regions.Region;
 import ru.mcfine.mycolony.mycolony.regions.RegionType;
@@ -27,34 +23,116 @@ import java.util.*;
 
 public class Utils {
 
-    private static MiniMessage mm = MiniMessage.miniMessage();
     private static HashMap<Player, BukkitTask> showRegionTasks = new HashMap<>();
     private static HashMap<Player, BukkitTask> showBlockingRegionTasks = new HashMap<>();
+    private static Map<Material, ItemStack> nextPageItem = new HashMap<>();
+    private static Map<Material, ItemStack> prevPageItem = new HashMap<>();
+    private static Map<Material, ItemStack> backItem = new HashMap<>();
+
+
     public static ItemStack getBackground() {
         return getBackground(Material.BLACK_STAINED_GLASS_PANE);
     }
 
-    public static ItemStack getNextPage(Material material){
+    public static ItemStack getNextPage(Material material) {
+        if(nextPageItem.get(material) == null) {
+            ConfigurationSection section = MyColony.plugin.getConfig().getConfigurationSection("next-page-item");
+            String displayName = Lang.translate("&2Next page");
+            int modelData = 0;
+            List<String> lore = new ArrayList<>();
+            int amount = 1;
+            if (section != null) {
+                displayName = Lang.translate(section.getString("display-name", "&2Next page"));
+                modelData = section.getInt("model-data", 0);
+                List<String> strings = section.getStringList("lore");
+                for (String s : strings) {
+                    lore.add(Lang.translate(s));
+                }
+                amount = section.getInt("amount", 1);
+            }
+            ItemStack nextPage = new ItemStack(material, amount);
+            ItemMeta meta = nextPage.getItemMeta();
+            meta.setDisplayName(displayName);
+            meta.setCustomModelData(modelData);
+            meta.setLore(lore);
+            nextPage.setItemMeta(meta);
+            nextPageItem.put(material, nextPage.clone());
+            return nextPage;
+        } else return nextPageItem.get(material).clone();
+    }
 
+    public static ItemStack getPrevPage(Material material) {
+        if(prevPageItem.get(material) == null) {
+            ConfigurationSection section = MyColony.plugin.getConfig().getConfigurationSection("previous-page-item");
+            String displayName = Lang.translate("&2Previous page");
+            int modelData = 0;
+            List<String> lore = new ArrayList<>();
+            int amount = 1;
+            if (section != null) {
+                displayName = Lang.translate(section.getString("display-name", "&4Previous page"));
+                modelData = section.getInt("model-data", 0);
+                List<String> strings = section.getStringList("lore");
+                for (String s : strings) {
+                    lore.add(Lang.translate(s));
+                }
+                amount = section.getInt("amount", 1);
+            }
+            ItemStack nextPage = new ItemStack(material, amount);
+            ItemMeta meta = nextPage.getItemMeta();
+            meta.setDisplayName(displayName);
+            meta.setCustomModelData(modelData);
+            meta.setLore(lore);
+            nextPage.setItemMeta(meta);
+            prevPageItem.put(material, nextPage.clone());
+            return nextPage;
+        } else return prevPageItem.get(material).clone();
+    }
+
+    public static ItemStack getPrevPage(Material material, String displayName) {
+        if(prevPageItem.get(material) == null) {
+            ConfigurationSection section = MyColony.plugin.getConfig().getConfigurationSection("previous-page-item");
+            displayName = Lang.translate(displayName);
+            int modelData = 0;
+            List<String> lore = new ArrayList<>();
+            int amount = 1;
+            if (section != null) {
+                modelData = section.getInt("model-data", 0);
+                List<String> strings = section.getStringList("lore");
+                for (String s : strings) {
+                    lore.add(Lang.translate(s));
+                }
+                amount = section.getInt("amount", 1);
+            }
+            ItemStack nextPage = new ItemStack(material, amount);
+            ItemMeta meta = nextPage.getItemMeta();
+            meta.setDisplayName(displayName);
+            meta.setCustomModelData(modelData);
+            meta.setLore(lore);
+            nextPage.setItemMeta(meta);
+            prevPageItem.put(material, nextPage.clone());
+            return nextPage;
+        } else return prevPageItem.get(material).clone();
     }
 
     public static ItemStack getBackground(Material material) {
-        ConfigurationSection section = MyColony.plugin.getConfig().getConfigurationSection("background-item");
-        Component displayName = Component.text(" ");
-        int modelData = 0;
-        if (section != null) {
-            displayName = mm.deserialize(section.getString("display-name", " "));
-            modelData = section.getInt("model-data", 0);
-        }
+        if(backItem.get(material) == null) {
+            ConfigurationSection section = MyColony.plugin.getConfig().getConfigurationSection("background-item");
+            String displayName = " ";
+            int modelData = 0;
+            if (section != null) {
+                displayName = Lang.translate(section.getString("display-name", " "));
+                modelData = section.getInt("model-data", 0);
+            }
 
 
-        ItemStack bg = new ItemStack(material, 1);
-        ItemMeta meta = bg.getItemMeta();
-        meta.setCustomModelData(modelData);
-        meta.displayName(displayName);
-        bg.setItemMeta(meta);
-
-        return bg;
+            ItemStack bg = new ItemStack(material, 1);
+            ItemMeta meta = bg.getItemMeta();
+            meta.setCustomModelData(modelData);
+            meta.setDisplayName(displayName);
+            bg.setItemMeta(meta);
+            backItem.put(material, bg.clone());
+            return bg;
+        } else return backItem.get(material).clone();
     }
 
     public static Pair<Location, Location> getRegionCorners(Location location, BlockFace blockFace, RegionType regionType) {
@@ -194,11 +272,11 @@ public class Utils {
         Pair<Location, Location> corners = getRegionCorners(location, blockFace, regionType);
         List<Location> outliner = getOutliner(corners, location.getWorld(), 20);
         final Integer[] counter = {20};
-        if(!blockingRegion) {
+        if (!blockingRegion) {
             if (showRegionTasks.get(player) != null && !showRegionTasks.get(player).isCancelled()) {
                 showRegionTasks.get(player).cancel();
             }
-        } else{
+        } else {
             if (showBlockingRegionTasks.get(player) != null && !showBlockingRegionTasks.get(player).isCancelled()) {
                 showBlockingRegionTasks.get(player).cancel();
             }
@@ -211,7 +289,7 @@ public class Utils {
                     new BukkitRunnable() {
                         @Override
                         public void run() {
-                            if(!blockingRegion) showRegionTasks.remove(player);
+                            if (!blockingRegion) showRegionTasks.remove(player);
                             else showBlockingRegionTasks.remove(player);
                         }
                     }.runTaskLater(MyColony.plugin, 0L);
@@ -226,15 +304,15 @@ public class Utils {
                 counter[0]--;
             }
         }.runTaskTimerAsynchronously(MyColony.plugin, 0L, 10L);
-        if(!blockingRegion) showRegionTasks.put(player, task);
+        if (!blockingRegion) showRegionTasks.put(player, task);
         else showBlockingRegionTasks.put(player, task);
     }
 
-    public static void showOutliner(Region region, Player player, ParticleEffect particleEffect, boolean blockingRegion){
+    public static void showOutliner(Region region, Player player, ParticleEffect particleEffect, boolean blockingRegion) {
         showOutliner(region.getLocation(), region.getBlockFace(), region.getRegionType(), player, particleEffect, blockingRegion);
     }
 
-    public Set<Chunk> getChunksInRadius(Chunk chunk, int radius){
+    public Set<Chunk> getChunksInRadius(Chunk chunk, int radius) {
         Set<Chunk> chunks = new HashSet<>();
         //chunks.add(chunk);
 
@@ -307,12 +385,12 @@ public class Utils {
         return (aMaxX >= bMinX && aMinX <= bMaxX) && (aMaxY >= bMinY && aMinY <= bMaxY) && (aMaxZ >= bMinZ && aMinZ <= bMaxZ);
     }
 
-    public static void clearRegionBordersVis(Player player){
-        if(showRegionTasks.get(player) != null && !showRegionTasks.get(player).isCancelled()){
+    public static void clearRegionBordersVis(Player player) {
+        if (showRegionTasks.get(player) != null && !showRegionTasks.get(player).isCancelled()) {
             showRegionTasks.get(player).cancel();
             showRegionTasks.remove(player);
         }
-        if(showBlockingRegionTasks.get(player) != null && !showBlockingRegionTasks.get(player).isCancelled()){
+        if (showBlockingRegionTasks.get(player) != null && !showBlockingRegionTasks.get(player).isCancelled()) {
             showBlockingRegionTasks.get(player).cancel();
             showBlockingRegionTasks.remove(player);
         }

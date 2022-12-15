@@ -1,7 +1,9 @@
 region-id: "cityhall"
-display-name: "City Hall"
+display-name: "&7City Hall"
+
 shop-group: city
 shop-amount: 1
+shop-icon: IRON_BLOCK
 
 right-offset: 3
 left-offset: 3

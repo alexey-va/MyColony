@@ -1,7 +1,9 @@
 region-id: "townhall_1"
-display-name: "Town Hall"
+display-name: "&6Produce"
+
 shop-group: default
 shop-amount: 1
+shop-icon: COAL_BLOCK
 
 right-offset: 3
 left-offset: 3

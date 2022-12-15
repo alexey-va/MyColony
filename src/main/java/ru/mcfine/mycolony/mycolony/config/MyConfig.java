@@ -27,8 +27,8 @@ import java.util.stream.Stream;
 public class MyConfig {
 
     private File configFile;
-    private Map<String, RegionType> regionTypes = new HashMap<>();
-    private Map<String, ShopGroup> shopGroups = new HashMap<>();
+    private static Map<String, RegionType> regionTypes = new HashMap<>();
+    private static Map<String, ShopGroup> shopGroups = new HashMap<>();
     public static HashMap<String, HashSet<Material>> buildingMaterialGroups = new HashMap<>();
 
     public MyConfig() {
@@ -40,20 +40,25 @@ public class MyConfig {
         if (!regions.exists()) regions.mkdirs();
 
         try (Stream<Path> stream = Files.walk(Paths.get(regions.getPath()))) {
-            stream.filter(path -> path.toString().endsWith(".yml")).forEach(path -> readRegionFile(path.toFile()));
+            stream.filter(path -> path.toString().endsWith(".yml")).forEach(path -> {
+                System.out.println("Path: "+path);
+                readRegionFile(path.toFile());
+            });
         } catch (Exception ex) {
             ex.printStackTrace();
         }
 
         Reflections reflections = new Reflections("regions", Scanners.Resources);
         Set<String> set = reflections.getResources(".*").stream().map(s -> '/' + s).collect(Collectors.toSet());
-        String path = MyColony.plugin.getDataFolder().toString() + fileSeparator;
+        String path = MyColony.plugin.getDataFolder() + fileSeparator;
         for (String s : set) {
+            System.out.println(s);
+            if(!s.endsWith(".yml")) continue;
             copy(MyColony.class.getResourceAsStream(s), (path + s));
         }
     }
 
-    public void copy(InputStream source, String destination) {
+    public static void copy(InputStream source, String destination) {
         try {
             File file = new File(destination);
             if (!file.exists()) {
@@ -66,7 +71,7 @@ public class MyConfig {
         }
     }
 
-    private void readRegionFile(File file) {
+    private static void readRegionFile(File file) {
         FileConfiguration data = YamlConfiguration.loadConfiguration(file);
         String name = data.getString("region-id", "default-id");
 
@@ -104,7 +109,6 @@ public class MyConfig {
         String displayName = data.getString("display-name", "display-name");
         boolean enabled = data.getBoolean("enabled", true);
         List<?> effectList = data.getList("effects");
-        double time = data.getDouble("period", 100);
         String shopGroup = data.getString("shop-group", "default");
         int shopAmount = data.getInt("shop-amount", 1);
         int chunkRadius = data.getInt("chunk-radius", 5);
@@ -126,25 +130,21 @@ public class MyConfig {
         RegionType regionType = new RegionType(productionEntries,
                 level, 1, 0, null, matList,
                 xRight, xLeft, zBackward, zForward, yDown, yUp, isCity, dynmapMarker,
-                shopIcon, price, displayName, enabled, requirementEntries, shopGroup, shopAmount, name, chunkRadius);
+                shopIcon, price, displayName, enabled, requirementEntries, shopGroup, shopAmount, name, chunkRadius, true);
 
-        for (var req : regionType.getReqs()) {
-            System.out.println(req.getCityLevels() + " \n " + req.getReqRegions() + " \n " + req.getReq() + " | " + req.getPermission());
-        }
 
         regionTypes.put(name, regionType);
         ShopGroup sg = shopGroups.get(shopGroup);
         if(sg == null) sg=shopGroups.get("default");
+        System.out.println(regionType.getDisplayName()+" | "+file.getPath());
         sg.addRegionType(regionType);
     }
 
-    private List<Requirement> parseReqs(ConfigurationSection section) {
-        System.out.println(section);
+    private static List<Requirement> parseReqs(ConfigurationSection section) {
         if (section == null) return null;
         List<Requirement> result = new ArrayList<>();
         List<String> strings = section.getStringList("requirements");
         for (String s : strings) {
-            System.out.println("String: " + s);
             if (!s.contains("=")) continue;
             String[] entries = s.split("=", 2);
             if (entries[0].equalsIgnoreCase("city_level")) {
@@ -174,7 +174,7 @@ public class MyConfig {
         return result;
     }
 
-    private List<ProductionEntry> parseProductionEntries(ConfigurationSection section) {
+    private static List<ProductionEntry> parseProductionEntries(ConfigurationSection section) {
         if (section == null) return null;
         List<ProductionEntry> result = new ArrayList<>();
         for (String prodKey : section.getKeys(false)) {
@@ -280,7 +280,6 @@ public class MyConfig {
                 for (String s : groupString.split(",")) {
                     try {
                         materials.add(Material.matchMaterial(s));
-                        //System.out.println(groupName+" | "+Material.matchMaterial(s));
                     } catch (Exception ex) {
                         ex.printStackTrace();
                     }
@@ -298,7 +297,7 @@ public class MyConfig {
                 defaultDescription, 1);
 
         section = MyColony.plugin.getConfig().getConfigurationSection("shop-groups");
-        this.shopGroups.put("default", defaultGroup);
+        shopGroups.put("default", defaultGroup);
         if(section != null){
             for(String key : section.getKeys(false)){
                 int priority = section.getInt(key+".priority", 1);
@@ -311,7 +310,7 @@ public class MyConfig {
                 String permission = section.getString(key+".permission", null);
 
                 ShopGroup shopGroup = new ShopGroup(name, material, iconAmount, permission, descriptionList, priority);
-                this.shopGroups.put(key, shopGroup);
+                shopGroups.put(key, shopGroup);
             }
         }
 

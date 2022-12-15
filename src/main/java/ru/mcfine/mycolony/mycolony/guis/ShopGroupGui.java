@@ -9,6 +9,7 @@ import com.github.stefvanschie.inventoryframework.pane.StaticPane;
 import net.kyori.adventure.text.Component;
 import org.bukkit.Material;
 import org.bukkit.entity.HumanEntity;
+import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.jetbrains.annotations.NotNull;
@@ -20,12 +21,13 @@ import ru.mcfine.mycolony.mycolony.util.Utils;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 public class ShopGroupGui extends ChestGui {
     private List<GuiItem> guiItemList = new ArrayList<>();
     private ShopMenu parentMenu;
-    public ShopGroupGui(ShopGroup shopGroup, ShopMenu parentMenu) {
-        super(3, shopGroup.getGroupName());
+    public ShopGroupGui(ShopGroup shopGroup, ShopMenu parentMenu, Player p) {
+        super(3, Lang.translate(shopGroup.getGroupName()));
         this.parentMenu = parentMenu;
 
         int rows = Math.max((int)Math.ceil(shopGroup.getRegionTypes().size()/7.0),1);
@@ -48,17 +50,15 @@ public class ShopGroupGui extends ChestGui {
 
         PaginatedPane shopPane = new PaginatedPane(1,1, 7, invRows-2);
         for(RegionType regionType : shopGroup.getRegionTypes()){
-            System.out.println("Region type: "+regionType);
             ItemStack itemStack = new ItemStack(regionType.getShopIcon(), regionType.getShopAmount());
             ItemMeta itemMeta = itemStack.getItemMeta();
-            itemMeta.displayName(Lang.translateToComponent(regionType.getDisplayName()));
-            List<Component> descr = new ArrayList<>();
-            descr.add(Lang.translateToComponent("Level: "+regionType.getLevel()));
-            descr.add(Lang.translateToComponent("Cost: "+regionType.getPrice()));
-            itemMeta.lore(descr);
+            itemMeta.setDisplayName(Lang.translate(regionType.getDisplayName()));
+            Map<String, String> map = Map.of(
+                    "%level%", regionType.getLevel()+"", "%price%", regionType.getPrice()+"");
+            itemMeta.setLore(Lang.getStringList("shop.lore", map, p));
             itemStack.setItemMeta(itemMeta);
             GuiItem guiItem = new GuiItem(itemStack, inventoryClickEvent -> {
-                ShopItemGui shopItemGui = new ShopItemGui(regionType, this);
+                ShopItemGui shopItemGui = new ShopItemGui(regionType, this, p);
                 shopItemGui.show(inventoryClickEvent.getWhoClicked());
                 inventoryClickEvent.setCancelled(true);
             });
@@ -68,18 +68,18 @@ public class ShopGroupGui extends ChestGui {
         this.addPane(shopPane);
 
         StaticPane navigation = new StaticPane(0, invRows-1, 9, 1, Pane.Priority.HIGH);
-        ItemStack
-        GuiItem prev = new GuiItem(new ItemStack(Material.RED_WOOL), inventoryClickEvent -> {
+        GuiItem prev = new GuiItem(Utils.getPrevPage(Material.ARROW), inventoryClickEvent -> {
             if(shopPane.getPage() == 0){
                 parentMenu.show(inventoryClickEvent.getWhoClicked());
             } else{
                 shopPane.setPage(shopPane.getPage() -1);
                 this.update();
             }
+            inventoryClickEvent.setCancelled(true);
         });
         navigation.addItem(prev, 0 ,0 );
 
-        GuiItem next = new GuiItem(new ItemStack(Material.GREEN_WOOL), inventoryClickEvent -> {
+        GuiItem next = new GuiItem(Utils.getNextPage(Material.ARROW), inventoryClickEvent -> {
             if(shopPane.getPages() ==1) return;
            if(shopPane.getPage() == shopPane.getPages() - 1){
                shopPane.setPage(0);
@@ -87,6 +87,7 @@ public class ShopGroupGui extends ChestGui {
                shopPane.setPage(shopPane.getPage()+1);
            }
            this.update();
+           inventoryClickEvent.setCancelled(true);
         });
         navigation.addItem(next, 8, 0);
         this.addPane(navigation);

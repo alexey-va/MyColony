@@ -7,9 +7,10 @@ import org.bukkit.plugin.PluginManager;
 import org.bukkit.plugin.RegisteredServiceProvider;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.scheduler.BukkitTask;
-import ru.mcfine.mycolony.mycolony.city.LandsAPIHook;
+import ru.mcfine.mycolony.mycolony.compat.LandsAPIHook;
 import ru.mcfine.mycolony.mycolony.commands.GetRegion;
 import ru.mcfine.mycolony.mycolony.compat.ColonyProtection;
+import ru.mcfine.mycolony.mycolony.compat.Papi;
 import ru.mcfine.mycolony.mycolony.config.Lang;
 import ru.mcfine.mycolony.mycolony.config.MyConfig;
 import ru.mcfine.mycolony.mycolony.listeners.BreakChest;
@@ -33,11 +34,30 @@ public final class MyColony extends JavaPlugin {
     public static Economy econ = null;
     public static Permission perms = null;
     public static Lang lang;
+    public static Papi papi = null;
+    public boolean useLands = false;
 
     @Override
     public void onEnable() {
         // Plugin startup logic
-        plugin = this;
+        if(Bukkit.getPluginManager().getPlugin("PlaceholderAPI") != null){
+            papi = new Papi();
+        }
+        if(Bukkit.getPluginManager().getPlugin("WorldGuard") != null){
+            protection = new ColonyProtection();
+        }
+        if(Bukkit.getPluginManager().getPlugin("ChestSort") != null){
+            this.chestSortAPI = true;
+        }
+
+
+        if (!setupEconomy() ) {
+            getLogger().severe(String.format("[%s] - Disabled due to no Vault dependency found!", getDescription().getName()));
+            getServer().getPluginManager().disablePlugin(this);
+            return;
+        }
+        setupPermissions();
+
         regionManager = new RegionManager();
         jsonStorage = new JsonStorage();
         config = new MyConfig();
@@ -50,27 +70,22 @@ public final class MyColony extends JavaPlugin {
         getCommand("mycolony").setExecutor(new GetRegion());
         tickerTask = new TickerRunnable(1).runTaskTimer(this, 20L, 20L);
         jsonStorage.loadData();
-        if(Bukkit.getPluginManager().getPlugin("WorldGuard") != null){
-            protection = new ColonyProtection();
-        }
-        if(Bukkit.getPluginManager().getPlugin("ChestSort") != null){
-            this.chestSortAPI = true;
-        }
-        if(Bukkit.getPluginManager().getPlugin("Lands") != null){
+
+    }
+
+    @Override
+    public void onLoad(){
+        plugin=this;
+        this.useLands = getConfig().getBoolean("lands-integration.enable", true);
+        if(Bukkit.getPluginManager().getPlugin("Lands") != null && useLands){
             this.landsHook  = new LandsAPIHook();
         }
-
-        if (!setupEconomy() ) {
-            getLogger().severe(String.format("[%s] - Disabled due to no Vault dependency found!", getDescription().getName()));
-            getServer().getPluginManager().disablePlugin(this);
-            return;
-        }
-        setupPermissions();
     }
 
     @Override
     public void onDisable() {
-        jsonStorage.saveDataSync();
+        jsonStorage.saveRegions();
+        jsonStorage.savePlayers();
     }
 
     private boolean setupEconomy() {

@@ -24,7 +24,7 @@ public class GetRegion implements CommandExecutor {
 
         if(sender instanceof Player player){
             if(args.length == 0){
-                ShopMenu shopMenu = new ShopMenu();
+                ShopMenu shopMenu = new ShopMenu(player);
                 shopMenu.show(player);
             }
             else if(args.length == 1){

@@ -15,24 +15,39 @@ building-material-groups:
   stairs: QUARTZ_STAIRS,SANDSTONE_STAIRS,RED_SANDSTONE_STAIRS,ACACIA_STAIRS,OAK_STAIRS,BIRCH_STAIRS,JUNGLE_STAIRS,SPRUCE_STAIRS,DARK_OAK_STAIRS,BRICK_STAIRS,COBBLESTONE_STAIRS,DARK_PRISMARINE_STAIRS,PRISMARINE_BRICK_STAIRS,PURPUR_STAIRS,STONE_BRICK_STAIRS,QUARTZ_STAIRS
   vertical: LADDER,QUARTZ_STAIRS,SANDSTONE_STAIRS,RED_SANDSTONE_STAIRS,ACACIA_STAIRS,OAK_STAIRS,BIRCH_STAIRS,JUNGLE_STAIRS,SPRUCE_STAIRS,DARK_OAK_STAIRS,BRICK_STAIRS,COBBLESTONE_STAIRS,DARK_PRISMARINE_STAIRS,PRISMARINE_BRICK_STAIRS,PURPUR_STAIRS,STONE_BRICK_STAIRS
 
+lands-integration:
+  enable: true
 
 background-item:
+  model-data: 0
+  display-name: " "
 
+previous-page-item:
+  model-data: 0
+  display-name: "&8Previous page"
+  lore:
+  amount: 1
+
+next-page-item:
+  model-data: 0
+  display-name: "&8Next page"
+  lore:
+  amount: 1
 
 shop-groups:
   city:
     priority: 1
     icon: GRASS_BLOCK
     icon-amount: 1
-    name: "Cities"
+    name: "&6Cities"
     description:
-      - "Hello"
-      - "Kek"
+      - "&7Hello"
+      - "&7Kek"
     permission: abd.asd
   default:
     priority: 1
     icon: "COBBLESTONE"
     icon-amount: 1
-    name: Basic
+    name: "&2Basic"
     description:
-      - "Just basic"
+      - "&e&oJust basic"

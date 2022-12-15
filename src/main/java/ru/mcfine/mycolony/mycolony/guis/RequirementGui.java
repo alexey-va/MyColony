@@ -43,7 +43,7 @@ public class RequirementGui extends ChestGui {
         for(Requirement req : requirements){
             ItemStack itemStack = new ItemStack(Material.RED_WOOL);
             ItemMeta itemMeta = itemStack.getItemMeta();
-            itemMeta.displayName(Component.text(req.getReq().toString()));
+            itemMeta.setDisplayName((req.getReq().toString()));
             itemStack.setItemMeta(itemMeta);
             GuiItem guiItem = new GuiItem(itemStack, inventoryClickEvent -> inventoryClickEvent.setCancelled(true));
             guiItemList.add(guiItem);

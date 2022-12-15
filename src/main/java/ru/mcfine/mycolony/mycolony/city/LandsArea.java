@@ -12,9 +12,9 @@ import java.util.*;
 
 public class LandsArea extends CityArea{
 
-    public Land land;
-    public Location center;
-    public World world;
+    private Land land;
+    private Location center;
+    private World world;
 
     public LandsArea(Location location){
         this.land = MyColony.plugin.landsHook.getLand(location);
@@ -24,7 +24,7 @@ public class LandsArea extends CityArea{
 
     @Override
     public boolean isInArea(Location location) {
-        return MyColony.plugin.landsHook.getLand(location) != null;
+        return this.land.hasChunk(location.getWorld(), location.getChunk().getX(), location.getChunk().getZ());
     }
 
     @Override
@@ -37,6 +37,7 @@ public class LandsArea extends CityArea{
     public Set<Chunk> getChunks() {
         Collection<ChunkCoordinate> chunks = this.land.getChunks(world);
         Set<Chunk> result = new HashSet<>();
+        if(chunks == null) return result;
         for(ChunkCoordinate chunkCoordinate : chunks){
             result.add(world.getChunkAt(chunkCoordinate.getX(), chunkCoordinate.getZ()));
         }
@@ -45,6 +46,31 @@ public class LandsArea extends CityArea{
 
     @Override
     public Set<BorderChunk> getBorderChunks() {
-        return null;
+        Set<Chunk> chunks = getChunks();
+        Set<BorderChunk> result = new HashSet<>();
+        for(Chunk chunk : chunks){
+            boolean xUp =  !chunks.contains(chunk.getWorld().getChunkAt(chunk.getX()+1, chunk.getZ()));
+            boolean xDown = !chunks.contains(chunk.getWorld().getChunkAt(chunk.getX()-1, chunk.getZ()));
+            boolean zUp = !chunks.contains(chunk.getWorld().getChunkAt(chunk.getX(), chunk.getZ()+1));
+            boolean zDown = !chunks.contains(chunk.getWorld().getChunkAt(chunk.getX(), chunk.getZ()-1));
+
+            if(xUp || xDown || zUp || zDown){
+                BorderChunk borderChunk = new BorderChunk(chunk, xUp, xDown, zUp, zDown );
+                result.add(borderChunk);
+            }
+        }
+        return result;
+    }
+
+    public Land getLand() {
+        return land;
+    }
+
+    public Location getCenter() {
+        return center;
+    }
+
+    public World getWorld() {
+        return world;
     }
 }

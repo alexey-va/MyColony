@@ -8,6 +8,7 @@ import com.github.stefvanschie.inventoryframework.pane.PaginatedPane;
 import com.github.stefvanschie.inventoryframework.pane.Pane;
 import com.github.stefvanschie.inventoryframework.pane.StaticPane;
 import org.bukkit.Material;
+import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import ru.mcfine.mycolony.mycolony.config.Lang;
 import ru.mcfine.mycolony.mycolony.config.MyConfig;
@@ -27,8 +28,8 @@ public class MaterialGroupGui extends ChestGui {
     Gui parent;
     List<GroupItem> groupItems;
 
-    public MaterialGroupGui(String groupName, Gui parent, List<GroupItem> groupItems) {
-        super(6, Lang.getString("groups." + groupName + "-display-name"));
+    public MaterialGroupGui(String groupName, Gui parent, List<GroupItem> groupItems, Player p) {
+        super(6, Lang.getString("groups." + groupName + "-display-name", p));
 
         HashSet<Material> mats = MyConfig.getMaterialGroup(groupName);
 
@@ -67,7 +68,7 @@ public class MaterialGroupGui extends ChestGui {
 
         StaticPane navigation = new StaticPane(0, rows - 1, 9, 1);
 
-        GuiItem prevPage = new GuiItem(new ItemStack(Material.RED_WOOL), event -> {
+        GuiItem prevPage = new GuiItem(Utils.getPrevPage(Material.ARROW), event -> {
             //System.out.println(materialPane.getPage() +" | page");
             if(materialPane.getPage() > 0){
                 materialPane.setPage(materialPane.getPage() - 1);
@@ -80,7 +81,7 @@ public class MaterialGroupGui extends ChestGui {
         });
         navigation.addItem(prevPage, 0, 0);
 
-        GuiItem nextPage = new GuiItem(new ItemStack(Material.GREEN_WOOL), event -> {
+        GuiItem nextPage = new GuiItem(Utils.getNextPage(Material.ARROW), event -> {
             if (materialPane.getPage() < materialPane.getPages() - 1) materialPane.setPage(materialPane.getPage() + 1);
             else materialPane.setPage(0);
             this.update();

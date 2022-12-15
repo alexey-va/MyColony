@@ -17,6 +17,7 @@ public class JsonStorage {
     public void loadData(){
         Gson gson = new Gson();
         loadRegions(gson);
+        loadPlayers(gson);
     }
 
     private void loadRegions(Gson gson){
@@ -67,7 +68,39 @@ public class JsonStorage {
         }
     }
 
-    public void saveDataSync() {
+    public void savePlayers(){
+        Gson gson = new GsonBuilder().setPrettyPrinting().create();
+        File file = new File(MyColony.plugin.getDataFolder().getAbsolutePath() + File.separator + "storage" + File.separator + "players.json");
+        //noinspection ResultOfMethodCallIgnored
+        file.getParentFile().mkdirs();
+        try {
+            //noinspection ResultOfMethodCallIgnored
+            file.createNewFile();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        Writer writer;
+        try {
+            writer = new FileWriter(file, false);
+        } catch (IOException e) {
+            e.printStackTrace();
+            return;
+        }
+
+        gson.toJson(MyColony.regionManager.getPlayerMock(), writer);
+        try {
+            writer.flush();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        try {
+            writer.close();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public void saveRegions() {
 
         Gson gson = new GsonBuilder().setPrettyPrinting().create();
         File file = new File(MyColony.plugin.getDataFolder().getAbsolutePath() + File.separator + "storage" + File.separator + "regions.json");

@@ -6,6 +6,7 @@ import com.github.stefvanschie.inventoryframework.pane.OutlinePane;
 import com.github.stefvanschie.inventoryframework.pane.PaginatedPane;
 import com.github.stefvanschie.inventoryframework.pane.Pane;
 import org.bukkit.Material;
+import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import ru.mcfine.mycolony.mycolony.config.Lang;
 import ru.mcfine.mycolony.mycolony.regions.BuildingMaterial;
@@ -23,8 +24,8 @@ public class BuildGui extends ChestGui {
     public PaginatedPane materialPane = null;
     private ArrayList<GroupItem> groupItems = new ArrayList<>();
 
-    public BuildGui(List<BuildingMaterial> mats) {
-        super(6, Lang.getString("menu.not-enough-materials"));
+    public BuildGui(List<BuildingMaterial> mats, Player p) {
+        super(6, Lang.getString("menu.not-enough-materials", p));
         int rows = calculateRows(mats, wPadding, vPadding);
         int pages = (int)Math.ceil(rows/(6.0-vPadding));
         this.setRows(rows);
@@ -56,7 +57,7 @@ public class BuildGui extends ChestGui {
         for(BuildingMaterial material : mats){
             int amount = material.getAmount();
             while(amount > 0){
-                GroupItem groupItem = new GroupItem(material, Math.min(64, material.getAmount()), this, groupItems);
+                GroupItem groupItem = new GroupItem(material, Math.min(64, material.getAmount()), this, groupItems, p);
                 groupItems.add(groupItem);
                 guiItems.add(groupItem.getGuiItem());
                 id++;
