@@ -9,7 +9,6 @@ import com.github.stefvanschie.inventoryframework.pane.StaticPane;
 import org.bukkit.Material;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.entity.Player;
-import org.jetbrains.annotations.NotNull;
 import ru.mcfine.mycolony.mycolony.config.Lang;
 import ru.mcfine.mycolony.mycolony.util.Utils;
 
@@ -25,16 +24,12 @@ public class PlayerActionGui extends ChestGui {
         this.setTitle(Lang.getString("menu.member-action.title", rep, p));
 
         OutlinePane background = new OutlinePane(0, 0, 9, 3, Pane.Priority.LOWEST);
-        background.addItem(new GuiItem(Utils.getBackground(), event -> {
-            event.setCancelled(true);
-        }));
+        background.addItem(new GuiItem(Utils.getBackground(), event -> event.setCancelled(true)));
         background.setRepeat(true);
         this.addPane(background);
 
         OutlinePane background2 = new OutlinePane(1, 1, 7, 1, Pane.Priority.LOW);
-        background2.addItem(new GuiItem(Utils.getBackground(Material.GRAY_STAINED_GLASS_PANE), event -> {
-            event.setCancelled(true);
-        }));
+        background2.addItem(new GuiItem(Utils.getBackground(Material.GRAY_STAINED_GLASS_PANE), event -> event.setCancelled(true)));
         background2.setRepeat(true);
         this.addPane(background2);
 

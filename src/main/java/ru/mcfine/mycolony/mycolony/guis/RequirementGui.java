@@ -5,13 +5,9 @@ import com.github.stefvanschie.inventoryframework.gui.type.ChestGui;
 import com.github.stefvanschie.inventoryframework.pane.OutlinePane;
 import com.github.stefvanschie.inventoryframework.pane.PaginatedPane;
 import com.github.stefvanschie.inventoryframework.pane.Pane;
-import com.github.stefvanschie.inventoryframework.pane.StaticPane;
-import net.kyori.adventure.text.Component;
 import org.bukkit.Material;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
-import org.bukkit.material.Chest;
-import org.jetbrains.annotations.NotNull;
 import ru.mcfine.mycolony.mycolony.requirements.Requirement;
 import ru.mcfine.mycolony.mycolony.util.Utils;
 
@@ -21,15 +17,13 @@ import java.util.List;
 
 public class RequirementGui extends ChestGui {
 
-    private List<GuiItem> guiItemList = new ArrayList<>();
+    private final List<GuiItem> guiItemList = new ArrayList<>();
 
     public RequirementGui(List<Requirement> requirements) {
         super(3, "Not satis");
 
         OutlinePane background = new OutlinePane(0, 0, 9, 3, Pane.Priority.LOWEST);
-        background.addItem(new GuiItem(Utils.getBackground(), event -> {
-            event.setCancelled(true);
-        }));
+        background.addItem(new GuiItem(Utils.getBackground(), event -> event.setCancelled(true)));
         background.setRepeat(true);
         this.addPane(background);
 

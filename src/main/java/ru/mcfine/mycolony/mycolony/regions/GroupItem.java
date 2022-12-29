@@ -2,14 +2,12 @@ package ru.mcfine.mycolony.mycolony.regions;
 
 import com.github.stefvanschie.inventoryframework.gui.GuiItem;
 import com.github.stefvanschie.inventoryframework.gui.type.util.Gui;
-import net.kyori.adventure.text.Component;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 import ru.mcfine.mycolony.mycolony.config.Lang;
 import ru.mcfine.mycolony.mycolony.config.MyConfig;
-import ru.mcfine.mycolony.mycolony.guis.BuildGui;
 import ru.mcfine.mycolony.mycolony.guis.MaterialGroupGui;
 import ru.mcfine.mycolony.mycolony.tasks.TickerRunnable;
 
@@ -33,9 +31,7 @@ public class GroupItem {
         ItemStack itemStack;
         if (buildingMaterial.getMaterial() != null) {
             itemStack = new ItemStack(buildingMaterial.getMaterial(), amount);
-            guiItem = new GuiItem(itemStack, inventoryClickEvent -> {
-                inventoryClickEvent.setCancelled(true);
-            });
+            guiItem = new GuiItem(itemStack, inventoryClickEvent -> inventoryClickEvent.setCancelled(true));
         } else {
             isGroup = true;
             matGroup = MyConfig.getMaterialGroup(groupName).stream().toList();
@@ -61,9 +57,7 @@ public class GroupItem {
         ItemStack itemStack;
         if (productionItem.getMaterial() != null) {
             itemStack = new ItemStack(productionItem.getMaterial(), amount);
-            guiItem = new GuiItem(itemStack, inventoryClickEvent -> {
-                inventoryClickEvent.setCancelled(true);
-            });
+            guiItem = new GuiItem(itemStack, inventoryClickEvent -> inventoryClickEvent.setCancelled(true));
         } else if(productionItem.getGroup() != null) {
             isGroup = true;
             matGroup = MyConfig.getMaterialGroup(groupName).stream().toList();

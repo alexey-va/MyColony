@@ -19,7 +19,6 @@ import ru.mcfine.mycolony.mycolony.util.Utils;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
-import java.util.stream.Collectors;
 
 public class MaterialGroupGui extends ChestGui {
 
@@ -40,9 +39,7 @@ public class MaterialGroupGui extends ChestGui {
         this.setRows(rows);
 
         OutlinePane background = new OutlinePane(0, 0, 9, rows, Pane.Priority.LOWEST);
-        GuiItem bgItem = new GuiItem(Utils.getBackground(), event -> {
-            event.setCancelled(true);
-        });
+        GuiItem bgItem = new GuiItem(Utils.getBackground(), event -> event.setCancelled(true));
         background.addItem(bgItem);
         background.setRepeat(true);
         this.addPane(background);
@@ -60,9 +57,7 @@ public class MaterialGroupGui extends ChestGui {
             itemStacks.add(new ItemStack(material, 1));
         }
         materialPane.populateWithItemStacks(itemStacks);
-        materialPane.setOnClick(event -> {
-            event.setCancelled(true);
-        });
+        materialPane.setOnClick(event -> event.setCancelled(true));
 
         this.addPane(materialPane);
 

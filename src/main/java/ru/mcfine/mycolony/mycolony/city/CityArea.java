@@ -1,7 +1,6 @@
 package ru.mcfine.mycolony.mycolony.city;
 
 import javafx.util.Pair;
-import org.bukkit.Bukkit;
 import org.bukkit.Chunk;
 import org.bukkit.Location;
 import org.bukkit.World;
@@ -10,10 +9,8 @@ import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.scheduler.BukkitTask;
 import org.bukkit.util.Vector;
 import ru.mcfine.mycolony.mycolony.MyColony;
-import ru.mcfine.mycolony.mycolony.config.MyConfig;
 import ru.mcfine.mycolony.mycolony.regions.RegionManager;
 import ru.mcfine.mycolony.mycolony.regions.RegionType;
-import ru.mcfine.mycolony.mycolony.util.Utils;
 import xyz.xenondevs.particle.ParticleBuilder;
 import xyz.xenondevs.particle.ParticleEffect;
 
@@ -22,8 +19,8 @@ import java.util.stream.Collectors;
 
 public abstract class CityArea {
 
-    private static Map<Player, BukkitTask> displayCityTasks = new HashMap<>();
-    private static Map<Player, BukkitTask> displayInterCityTasks = new HashMap<>();
+    private static final Map<Player, BukkitTask> displayCityTasks = new HashMap<>();
+    private static final Map<Player, BukkitTask> displayInterCityTasks = new HashMap<>();
 
     public abstract boolean isInArea(Location location);
 
@@ -110,9 +107,7 @@ public abstract class CityArea {
                     this.cancel();
                     return;
                 }
-                locations.forEach( loc -> {
-                    new ParticleBuilder(particleEffect, loc).setAmount(3).setSpeed(0f).setOffset(new Vector(0.1, 0.1, 0.1)).display(player);
-                });
+                locations.forEach( loc -> new ParticleBuilder(particleEffect, loc).setAmount(3).setSpeed(0f).setOffset(new Vector(0.1, 0.1, 0.1)).display(player));
                 timer[0] ++;
             }
         }.runTaskTimerAsynchronously(MyColony.plugin, 0L, 10L);

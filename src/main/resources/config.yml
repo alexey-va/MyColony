@@ -34,6 +34,10 @@ next-page-item:
   lore:
   amount: 1
 
+region-groups:
+  default:
+    display-name: "&6General"
+
 shop-groups:
   city:
     priority: 1

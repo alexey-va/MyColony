@@ -6,14 +6,10 @@ import com.github.stefvanschie.inventoryframework.pane.OutlinePane;
 import com.github.stefvanschie.inventoryframework.pane.PaginatedPane;
 import com.github.stefvanschie.inventoryframework.pane.Pane;
 import com.github.stefvanschie.inventoryframework.pane.StaticPane;
-import net.kyori.adventure.text.Component;
 import org.bukkit.Material;
-import org.bukkit.entity.HumanEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
-import org.jetbrains.annotations.NotNull;
-import ru.mcfine.mycolony.mycolony.MyColony;
 import ru.mcfine.mycolony.mycolony.config.Lang;
 import ru.mcfine.mycolony.mycolony.regions.RegionType;
 import ru.mcfine.mycolony.mycolony.shop.ShopGroup;
@@ -24,8 +20,8 @@ import java.util.List;
 import java.util.Map;
 
 public class ShopGroupGui extends ChestGui {
-    private List<GuiItem> guiItemList = new ArrayList<>();
-    private ShopMenu parentMenu;
+    private final List<GuiItem> guiItemList = new ArrayList<>();
+    private final ShopMenu parentMenu;
     public ShopGroupGui(ShopGroup shopGroup, ShopMenu parentMenu, Player p) {
         super(3, Lang.translate(shopGroup.getGroupName()));
         this.parentMenu = parentMenu;
@@ -35,9 +31,7 @@ public class ShopGroupGui extends ChestGui {
         this.setRows(invRows);
 
         OutlinePane background = new OutlinePane(0,0,9,invRows, Pane.Priority.LOWEST);
-        background.addItem(new GuiItem(Utils.getBackground(), event -> {
-            event.setCancelled(true);
-        }));
+        background.addItem(new GuiItem(Utils.getBackground(), event -> event.setCancelled(true)));
         background.setRepeat(true);
         this.addPane(background);
 

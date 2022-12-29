@@ -10,11 +10,11 @@ import java.util.Set;
 
 public class BorderChunk {
 
-    private Chunk chunk;
-    private boolean xUp;
-    private boolean xDown;
-    private boolean zUp;
-    private boolean zDown;
+    private final Chunk chunk;
+    private final boolean xUp;
+    private final boolean xDown;
+    private final boolean zUp;
+    private final boolean zDown;
 
     public BorderChunk(Chunk chunk, boolean xUp, boolean xDown, boolean zUp, boolean zDown) {
         this.chunk = chunk;

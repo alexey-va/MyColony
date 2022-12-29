@@ -7,14 +7,12 @@ import com.github.stefvanschie.inventoryframework.pane.PaginatedPane;
 import com.github.stefvanschie.inventoryframework.pane.Pane;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
-import org.bukkit.inventory.ItemStack;
 import ru.mcfine.mycolony.mycolony.config.Lang;
 import ru.mcfine.mycolony.mycolony.regions.BuildingMaterial;
 import ru.mcfine.mycolony.mycolony.regions.GroupItem;
 import ru.mcfine.mycolony.mycolony.util.Utils;
 
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.List;
 
 public class BuildGui extends ChestGui {
@@ -22,7 +20,7 @@ public class BuildGui extends ChestGui {
     int wPadding = 2;
     int vPadding = 2;
     public PaginatedPane materialPane = null;
-    private ArrayList<GroupItem> groupItems = new ArrayList<>();
+    private final ArrayList<GroupItem> groupItems = new ArrayList<>();
 
     public BuildGui(List<BuildingMaterial> mats, Player p) {
         super(6, Lang.getString("menu.not-enough-materials", p));
@@ -31,9 +29,7 @@ public class BuildGui extends ChestGui {
         this.setRows(rows);
 
         OutlinePane background = new OutlinePane(0, 0, 9, rows, Pane.Priority.LOWEST);
-        GuiItem bgItem = new GuiItem(Utils.getBackground(), event -> {
-            event.setCancelled(true);
-        });
+        GuiItem bgItem = new GuiItem(Utils.getBackground(), event -> event.setCancelled(true));
         background.addItem(bgItem);
         background.setRepeat(true);
         this.addPane(background);
@@ -45,9 +41,7 @@ public class BuildGui extends ChestGui {
             this.addPane(background2);
         }
 
-        setOnClose(close -> {
-            Utils.getBackground(Material.GRAY_STAINED_GLASS_PANE);
-        });
+        setOnClose(close -> Utils.getBackground(Material.GRAY_STAINED_GLASS_PANE));
 
         materialPane = new PaginatedPane(wPadding/2, vPadding/2, 9-wPadding, 9-vPadding, Pane.Priority.NORMAL);
 

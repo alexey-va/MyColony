@@ -33,7 +33,7 @@ import java.util.*;
 
 public class PutChest implements Listener {
 
-    private static Map<Player, Double> cooldownPutChest = new HashMap<>();
+    private static final Map<Player, Double> cooldownPutChest = new HashMap<>();
     private static BukkitTask cooldownTask = null;
 
     @EventHandler

@@ -12,9 +12,9 @@ import java.util.*;
 
 public class LandsArea extends CityArea{
 
-    private Land land;
-    private Location center;
-    private World world;
+    private final Land land;
+    private final Location center;
+    private final World world;
 
     public LandsArea(Location location){
         this.land = MyColony.plugin.landsHook.getLand(location);

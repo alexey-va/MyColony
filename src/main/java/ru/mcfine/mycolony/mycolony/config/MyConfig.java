@@ -8,6 +8,8 @@ import org.reflections.Reflections;
 import org.reflections.scanners.Scanners;
 import ru.mcfine.mycolony.mycolony.MyColony;
 import ru.mcfine.mycolony.mycolony.production.ProductionEntry;
+import ru.mcfine.mycolony.mycolony.regimes.Regime;
+import ru.mcfine.mycolony.mycolony.regimes.RegimeBuff;
 import ru.mcfine.mycolony.mycolony.regions.BuildingMaterial;
 import ru.mcfine.mycolony.mycolony.regions.ProductionItem;
 import ru.mcfine.mycolony.mycolony.regions.RegionType;
@@ -27,8 +29,10 @@ import java.util.stream.Stream;
 public class MyConfig {
 
     private File configFile;
-    private static Map<String, RegionType> regionTypes = new HashMap<>();
-    private static Map<String, ShopGroup> shopGroups = new HashMap<>();
+    private static final Map<String, RegionType> regionTypes = new HashMap<>();
+    private static final Map<String, Regime> regimeTypes = new HashMap<>();
+    private static final Map<String, RegionGroup> regionGroups = new HashMap<>();
+    private static final Map<String, ShopGroup> shopGroups = new HashMap<>();
     public static HashMap<String, HashSet<Material>> buildingMaterialGroups = new HashMap<>();
 
     public MyConfig() {
@@ -112,11 +116,12 @@ public class MyConfig {
         String shopGroup = data.getString("shop-group", "default");
         int shopAmount = data.getInt("shop-amount", 1);
         int chunkRadius = data.getInt("chunk-radius", 5);
+        List<String> groupNames = data.getStringList("groups");
 
 
         if (effectList != null) {
             try {
-                effectList = (List<String>) effectList;
+                effectList = effectList;
             } catch (Exception ex) {
                 ex.printStackTrace();
             }
@@ -127,7 +132,7 @@ public class MyConfig {
 
         if(productionEntries != null) productionEntries.sort(Comparator.comparingInt(ProductionEntry::getPriority));
 
-        RegionType regionType = new RegionType(productionEntries,
+        RegionType regionType = new RegionType(groupNames, productionEntries,
                 level, 1, 0, null, matList,
                 xRight, xLeft, zBackward, zForward, yDown, yUp, isCity, dynmapMarker,
                 shopIcon, price, displayName, enabled, requirementEntries, shopGroup, shopAmount, name, chunkRadius, true);
@@ -267,6 +272,46 @@ public class MyConfig {
         return result;
     }
 
+    private void readRegimeFile(File file){
+        FileConfiguration data = YamlConfiguration.loadConfiguration(file);
+        String id = data.getString("regime-id", null);
+        if(id == null) {
+            MyColony.plugin.getLogger().severe("File "+file+" has no regime-id! Skipping!");
+            return;
+        }
+
+        String iconString = data.getString("icon-material", "BEDROCK");
+        Material material = Material.matchMaterial(iconString);
+        if(material == null) material = Material.BEDROCK;
+        String displayName = data.getString("display-name", "No display name");
+        List<RegimeBuff> regimeBuffs = parseRegimeBuffs(data.getConfigurationSection("regime-buffs"));
+        Regime regime = new Regime(material, displayName, regimeBuffs);
+        regimeTypes.put(id, )
+
+    }
+
+    private List<RegimeBuff> parseRegimeBuffs(ConfigurationSection section){
+        if(section == null) return new ArrayList<>();
+        List<RegimeBuff> regimeBuffs = new ArrayList<>();
+        for(String key : section.getKeys(false)){
+            String typeStr = section.getString(key+".type", null);
+            RegimeBuff.Type type = RegimeBuff.matchType(typeStr);
+            if(type == null){
+                MyColony.plugin.getLogger().severe("Regime buff with key "+key+" does not have a type.");
+                continue;
+            }
+            String displayName = section.getString(key+".display-name", "display-name");
+            String loreString = section.getString(key+".lore", null);
+            List<String> loreList = section.getStringList(key+".lore");
+            if(loreList.size() == 0 && loreString != null) loreList.add(loreString);
+            double amount = section.getDouble(key+".amount", 1.0);
+
+            RegimeBuff regimeBuff = new RegimeBuff(type, amount, displayName, loreList, key);
+            regimeBuffs.add(regimeBuff);
+        }
+        return regimeBuffs;
+    }
+
 
     private void loadConfig() {
 
@@ -286,6 +331,16 @@ public class MyConfig {
                 }
 
                 buildingMaterialGroups.put(groupName, materials);
+            }
+        }
+
+        // Region groups
+        ConfigurationSection groupsSection = MyColony.plugin.getConfig().getConfigurationSection("region-groups");
+        if(groupsSection != null){
+            for(String key : groupsSection.getKeys(false)){
+                String displayName = groupsSection.getString(key+".display-name", key);
+                RegionGroup regionGroup = new RegionGroup(key, displayName);
+                regionGroups.put(key, regionGroup);
             }
         }
 

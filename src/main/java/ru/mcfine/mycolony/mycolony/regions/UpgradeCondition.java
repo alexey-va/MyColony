@@ -2,13 +2,12 @@ package ru.mcfine.mycolony.mycolony.regions;
 
 import org.bukkit.Bukkit;
 import org.bukkit.OfflinePlayer;
-import org.bukkit.World;
 import ru.mcfine.mycolony.mycolony.MyColony;
 import ru.mcfine.mycolony.mycolony.city.CityRegion;
 
 public class UpgradeCondition {
 
-    private Condition condition;
+    private final Condition condition;
     private int cityLevel;
     private double timePassed;
     private double moneyEarned;

@@ -9,8 +9,6 @@ import org.bukkit.Material;
 import org.bukkit.block.Block;
 import org.bukkit.block.Chest;
 import org.bukkit.entity.Player;
-import org.bukkit.inventory.Inventory;
-import org.bukkit.inventory.InventoryView;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.inventory.meta.SkullMeta;
@@ -57,22 +55,16 @@ public class RegionGui extends ChestGui{
         }
 
         OutlinePane background = new OutlinePane(0, 0, 9, 5, Pane.Priority.LOWEST);
-        background.addItem(new GuiItem(Utils.getBackground(),event -> {
-            event.setCancelled(true);
-        }));
+        background.addItem(new GuiItem(Utils.getBackground(),event -> event.setCancelled(true)));
         background.setRepeat(true);
         this.addPane(background);
 
         OutlinePane background2 = new OutlinePane(1, 1, 7, 3, Pane.Priority.LOW);
-        background2.addItem(new GuiItem(Utils.getBackground(Material.GRAY_STAINED_GLASS_PANE),event -> {
-            event.setCancelled(true);
-        }));
+        background2.addItem(new GuiItem(Utils.getBackground(Material.GRAY_STAINED_GLASS_PANE),event -> event.setCancelled(true)));
         background2.setRepeat(true);
         this.addPane(background2);
 
-        this.setOnClose(event -> {
-            TickerRunnable.mainMenuGuis.remove(this);
-        });
+        this.setOnClose(event -> TickerRunnable.mainMenuGuis.remove(this));
 
         mainPane = new StaticPane(1,1,7,3);
 
@@ -83,7 +75,7 @@ public class RegionGui extends ChestGui{
         chest.setItemMeta(meta);
         GuiItem chestItem = new GuiItem(chest, event ->{
             Chest chestState = (Chest)block.getState();
-            chestState.setCustomName(Lang.translate(region.getRegionName()));
+            chestState.setCustomName(Lang.translate(region.getRegionType().getDisplayName()));
             event.getWhoClicked().openInventory(chestState.getInventory());
             event.setCancelled(true);
         });
@@ -94,9 +86,7 @@ public class RegionGui extends ChestGui{
         meta1.setDisplayName(Lang.getString("menu.time-to-next-display", rep, p));
         meta1.setLore(Lang.getStringList("menu.time-to-next-lore", rep, p));
         timer.setItemMeta(meta1);
-        clockItem = new GuiItem(timer, event ->{
-            event.setCancelled(true);
-        });
+        clockItem = new GuiItem(timer, event -> event.setCancelled(true));
         mainPane.addItem(clockItem,2 ,0);
 
         ItemStack paper = new ItemStack(Material.PAPER);
@@ -108,9 +98,7 @@ public class RegionGui extends ChestGui{
             metaPaper.setLore(Lang.getStringList("menu.city-info-lore", rep, p));
         } else metaPaper.setLore(Lang.getStringList("menu.info-lore", rep, p));
         paper.setItemMeta(metaPaper);
-        paperItem = new GuiItem(paper, inventoryClickEvent -> {
-            inventoryClickEvent.setCancelled(true);
-        });
+        paperItem = new GuiItem(paper, inventoryClickEvent -> inventoryClickEvent.setCancelled(true));
         mainPane.addItem(paperItem, 4, 0);
 
         ItemStack bank = new ItemStack(Material.GOLD_INGOT);

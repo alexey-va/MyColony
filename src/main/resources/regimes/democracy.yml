@@ -1,0 +1,27 @@
+display-name: "&2Democracy"
+icon-material: DIAMOND_BLOCK
+regime-id: democracy
+regime-buffs:
+  first:
+    display-name: "Discount"
+    lore:
+      - "This"
+      - "is discount"
+    type: COST_MULTIPLIER
+    amount: 0.9
+  second:
+    display-name: "Income boost"
+    lore: "This is income boost"
+    type: MONEY_INCOME_MULTIPLIER
+    amount: 1.1
+  third:
+    display-name: "Cycle time reducer"
+    lore: "this is kek"
+    type: CYCLE_TIME_MULTIPLIER
+    amount: 0.9
+upgrades:
+  dict:
+    regime-type-id: dictatorship
+    auto: true
+    conditions:
+      type:

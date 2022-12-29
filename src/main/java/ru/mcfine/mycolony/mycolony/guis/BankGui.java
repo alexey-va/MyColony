@@ -10,16 +10,13 @@ import com.github.stefvanschie.inventoryframework.pane.StaticPane;
 import net.milkbowl.vault.economy.EconomyResponse;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
-import org.bukkit.OfflinePlayer;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.scheduler.BukkitRunnable;
-import org.jetbrains.annotations.NotNull;
 import ru.mcfine.mycolony.mycolony.MyColony;
 import ru.mcfine.mycolony.mycolony.config.Lang;
 import ru.mcfine.mycolony.mycolony.regions.Region;
-import ru.mcfine.mycolony.mycolony.tasks.TickerRunnable;
 import ru.mcfine.mycolony.mycolony.util.Utils;
 
 import java.util.HashMap;
@@ -27,8 +24,8 @@ import java.util.Map;
 
 public class BankGui extends ChestGui {
 
-    private BankGui thisGui;
-    private Gui parentGui;
+    private final BankGui thisGui;
+    private final Gui parentGui;
     private GuiItem info;
 
     public BankGui(Region region, Gui parentGui, Player p) {
@@ -45,16 +42,12 @@ public class BankGui extends ChestGui {
         rep.put("%balance%", region.getBankDeposit()+"");
 
         OutlinePane background = new OutlinePane(0, 0, 9, 3, Pane.Priority.LOWEST);
-        background.addItem(new GuiItem(Utils.getBackground(), event -> {
-            event.setCancelled(true);
-        }));
+        background.addItem(new GuiItem(Utils.getBackground(), event -> event.setCancelled(true)));
         background.setRepeat(true);
         this.addPane(background);
 
         OutlinePane background2 = new OutlinePane(1, 1, 7, 1, Pane.Priority.LOW);
-        background2.addItem(new GuiItem(Utils.getBackground(Material.GRAY_STAINED_GLASS_PANE), event -> {
-            event.setCancelled(true);
-        }));
+        background2.addItem(new GuiItem(Utils.getBackground(Material.GRAY_STAINED_GLASS_PANE), event -> event.setCancelled(true)));
         background2.setRepeat(true);
         this.addPane(background2);
 
@@ -69,9 +62,7 @@ public class BankGui extends ChestGui {
             AnvilGui anvilGui = new AnvilGui(Lang.getString("menu.bank.anvil-title-deposit", p));
             anvilGui.setOnTopDrag(inventoryClickEvent1 -> inventoryClickEvent1.setCancelled(true));
             anvilGui.setOnBottomDrag(inventoryClickEvent1 -> inventoryClickEvent1.setCancelled(true));
-            anvilGui.setOnClose(inventoryCloseEvent -> {
-                thisGui.show(inventoryCloseEvent.getPlayer());
-            });
+            anvilGui.setOnClose(inventoryCloseEvent -> thisGui.show(inventoryCloseEvent.getPlayer()));
             OutlinePane anvilPane = new OutlinePane(0,0,3,1);
             ItemStack anvilStack = new ItemStack(Material.GOLD_INGOT);
             ItemMeta anvilMeta = anvilStack.getItemMeta();
@@ -140,9 +131,7 @@ public class BankGui extends ChestGui {
             AnvilGui anvilGui = new AnvilGui(Lang.getString("menu.bank.anvil-title-withdraw", p));
             anvilGui.setOnTopDrag(inventoryClickEvent1 -> inventoryClickEvent1.setCancelled(true));
             anvilGui.setOnBottomDrag(inventoryClickEvent1 -> inventoryClickEvent1.setCancelled(true));
-            anvilGui.setOnClose(inventoryCloseEvent -> {
-                thisGui.show(inventoryCloseEvent.getPlayer());
-            });
+            anvilGui.setOnClose(inventoryCloseEvent -> thisGui.show(inventoryCloseEvent.getPlayer()));
             OutlinePane anvilPane = new OutlinePane(0,0,3,1);
             ItemStack anvilStack = new ItemStack(Material.GOLD_INGOT);
             ItemMeta anvilMeta = anvilStack.getItemMeta();

@@ -23,11 +23,11 @@ import java.util.*;
 
 public class Utils {
 
-    private static HashMap<Player, BukkitTask> showRegionTasks = new HashMap<>();
-    private static HashMap<Player, BukkitTask> showBlockingRegionTasks = new HashMap<>();
-    private static Map<Material, ItemStack> nextPageItem = new HashMap<>();
-    private static Map<Material, ItemStack> prevPageItem = new HashMap<>();
-    private static Map<Material, ItemStack> backItem = new HashMap<>();
+    private static final HashMap<Player, BukkitTask> showRegionTasks = new HashMap<>();
+    private static final HashMap<Player, BukkitTask> showBlockingRegionTasks = new HashMap<>();
+    private static final Map<Material, ItemStack> nextPageItem = new HashMap<>();
+    private static final Map<Material, ItemStack> prevPageItem = new HashMap<>();
+    private static final Map<Material, ItemStack> backItem = new HashMap<>();
 
 
     public static ItemStack getBackground() {

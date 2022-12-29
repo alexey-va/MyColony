@@ -1,6 +1,5 @@
 package ru.mcfine.mycolony.mycolony.shop;
 
-import net.kyori.adventure.text.Component;
 import org.bukkit.Material;
 import ru.mcfine.mycolony.mycolony.config.Lang;
 import ru.mcfine.mycolony.mycolony.regions.RegionType;
@@ -16,9 +15,9 @@ public class ShopGroup {
     private Material groupIcon;
     private int groupIconAmount;
     private String permission;
-    private List<String> description = new ArrayList<>();
+    private final List<String> description = new ArrayList<>();
     private int prioroty;
-    private Set<RegionType> regionTypes = new HashSet<>();
+    private final Set<RegionType> regionTypes = new HashSet<>();
 
 
     public ShopGroup(String groupName, Material groupIcon, int groupIconAmount,

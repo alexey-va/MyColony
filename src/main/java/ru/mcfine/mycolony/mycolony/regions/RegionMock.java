@@ -1,12 +1,8 @@
 package ru.mcfine.mycolony.mycolony.regions;
 
-import org.bukkit.Location;
-import ru.mcfine.mycolony.mycolony.city.CityArea;
 import ru.mcfine.mycolony.mycolony.city.CityRegion;
 import ru.mcfine.mycolony.mycolony.city.SquareArea;
 
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Set;
 
 public class RegionMock {
@@ -34,7 +30,7 @@ public class RegionMock {
     public RegionMock(Region region){
         this.playerNames = region.getPlayerNames();
         this.level = region.getLevel();
-        this.x = region.getX();;
+        this.x = region.getX();
         this.y = region.getY();
         this.z = region.getZ();
         this.worldName = region.getWorldName();

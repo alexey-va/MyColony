@@ -29,15 +29,15 @@ public class Region {
     private Set<String> playerUUIDs;
     private String regionName;
     private double timeElapsed = 0;
-    private double maxTime = 10;
-    private Location location;
+    private final double maxTime = 10;
+    private final Location location;
     private double totalIncome;
-    private RegionType regionType;
-    private boolean requiresMaterials = false;
-    private double income = 10;
+    private final RegionType regionType;
+    private final boolean requiresMaterials = false;
+    private final double income = 10;
     private boolean notified = false;
-    private String uuid;
-    private String selectedChain = null;
+    private final String uuid;
+    private final String selectedChain = null;
     private double bankDeposit = 0;
     private CityRegion cityRegion = null;
     private BlockFace blockFace = null;
@@ -77,19 +77,19 @@ public class Region {
             this.timeElapsed = 0;
             if (this.regionType.getProductionEntries() != null) {
                 boolean success = false;
-                    for (ProductionEntry productionEntry : this.regionType.getProductionEntries()) {
-                        if(selectedChain != null && !productionEntry.getName().equals(selectedChain)) continue;
-                        //System.out.println(productionEntry);
-                        var check = checkProductionConditions(productionEntry);
-                        //System.out.println(check +" | "+check.getKey()+" | "+check.getValue().get(0));
-                        if (check == null || !(check.getKey() && check.getValue().size() == 0)) continue;
-                        takeConsumables(productionEntry);
-                        putProduction(productionEntry);
-                        notifyPlayer(2);
-                        notified = false;
-                        success = true;
-                        break;
-                    }
+                for (ProductionEntry productionEntry : this.regionType.getProductionEntries()) {
+                    if (selectedChain != null && !productionEntry.getName().equals(selectedChain)) continue;
+                    //System.out.println(productionEntry);
+                    var check = checkProductionConditions(productionEntry);
+                    //System.out.println(check +" | "+check.getKey()+" | "+check.getValue().get(0));
+                    if (check == null || !(check.getKey() && check.getValue().size() == 0)) continue;
+                    takeConsumables(productionEntry);
+                    putProduction(productionEntry);
+                    notifyPlayer(2);
+                    notified = false;
+                    success = true;
+                    break;
+                }
             }
         }
     }
@@ -131,20 +131,20 @@ public class Region {
 
             List<ProductionItem> clear = new ArrayList<>();
             for (ProductionItem ct : input) {
-                if(ct.type == ProductionItem.Type.MONEY){
-                    if(ct.moneyAmount > this.bankDeposit){
+                if (ct.type == ProductionItem.Type.MONEY) {
+                    if (ct.moneyAmount > this.bankDeposit) {
                         MyColony.plugin.getLogger().severe("For some reason region deposit is lower than it should be.");
                     }
                     this.setBankDeposit(this.getBankDeposit() - ct.moneyAmount);
                     continue;
                 }
                 if (ct.hasMaterial(itemStack.getType())) {
-                    if(ct.type == ProductionItem.Type.TOOL || ct.type == ProductionItem.Type.TOOL_GROUP){
+                    if (ct.type == ProductionItem.Type.TOOL || ct.type == ProductionItem.Type.TOOL_GROUP) {
                         ItemMeta meta = itemStack.getItemMeta();
-                        if(meta instanceof Damageable damageable){
+                        if (meta instanceof Damageable damageable) {
                             int usesLeft = itemStack.getType().getMaxDurability() - damageable.getDamage();
                             if (usesLeft > ct.amount) {
-                                damageable.setDamage(damageable.getDamage()+ct.amount);
+                                damageable.setDamage(damageable.getDamage() + ct.amount);
                                 itemStack.setItemMeta(damageable);
                                 clear.add(ct);
                             } else if (usesLeft == ct.amount) {
@@ -157,7 +157,7 @@ public class Region {
                         } else {
                             System.out.println("Not damagable?");
                         }
-                    }else {
+                    } else {
                         //System.out.println(ct.amount+" am| "+(itemStack.getAmount() - ct.amount));
                         int newAmount = itemStack.getAmount() - ct.amount;
                         if (newAmount < 0) {
@@ -185,7 +185,7 @@ public class Region {
         for (ProductionItem output : prod.getOutput()) {
             //System.out.println(output.material +" |out "+output.amount);
             if (output.type == ProductionItem.Type.MONEY) {
-                this.setBankDeposit(this.getBankDeposit()+output.moneyAmount);
+                this.setBankDeposit(this.getBankDeposit() + output.moneyAmount);
             } else {
                 int amount = output.amount;
                 while (amount > 0) {
@@ -232,18 +232,15 @@ public class Region {
                 continue;
             }
 
-            // Check if has mats
             List<ProductionItem> clear = new ArrayList<>();
             for (var in : input) {
-                if(in.type == ProductionItem.Type.MONEY){
-                    if(this.getBankDeposit() >= in.getMoneyAmount()) clear.add(in);
+                if (in.type == ProductionItem.Type.MONEY) {
+                    if (this.getBankDeposit() >= in.getMoneyAmount()) clear.add(in);
                 } else if (in.hasMaterial(itemStack.getType())) {
-                    //System.out.println(in.type);
                     if (in.type == ProductionItem.Type.TOOL || in.type == ProductionItem.Type.TOOL_GROUP) {
                         ItemMeta meta = itemStack.getItemMeta();
                         if (meta instanceof Damageable damageable) {
                             int usesLeft = itemStack.getType().getMaxDurability() - damageable.getDamage();
-                            //System.out.println(itemStack.getType().getMaxDurability()+" | "+damageable.getDamage());
                             if (usesLeft > in.amount) {
                                 clear.add(in);
                             } else if (usesLeft == in.amount) {
@@ -253,7 +250,7 @@ public class Region {
                                 freeSlots++;
                                 in.amount = in.amount - usesLeft;
                             }
-                        } else{
+                        } else {
                             System.out.println("Not damagable tool?");
                         }
                     } else {
@@ -308,13 +305,15 @@ public class Region {
         return new Pair<>(fits, input);
     }
 
-    public boolean canDestroy(Player player){
-        if(playerNames.contains(player.getName())) return true;
+    public boolean canDestroy(Player player) {
+        if (playerNames.contains(player.getName())) return true;
+        if(player.hasPermission("mycolony.destroy-any")) return true;
         return getCityRegion() != null && getCityRegion().getOwnerName().equals(player.getName()) && getCityRegion().getRegionType().isAbsolutePower();
     }
 
-    public boolean canOpen(Player player){
-        if(playerNames.contains(player.getName())) return true;
+    public boolean canOpen(Player player) {
+        if (playerNames.contains(player.getName())) return true;
+        if(player.hasPermission("mycolony.open-any")) return true;
         return getCityRegion() != null && getCityRegion().getOwnerName().equals(player.getName()) && getCityRegion().getRegionType().isAbsolutePower();
     }
 
@@ -441,7 +440,8 @@ public class Region {
     public CityRegion getCityRegion() {
         return cityRegion;
     }
-    public void addMember(String name, String uuid){
+
+    public void addMember(String name, String uuid) {
         this.playerNames.add(name);
         this.playerUUIDs.add(uuid);
     }

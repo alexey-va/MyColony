@@ -1,7 +1,6 @@
 package ru.mcfine.mycolony.mycolony.regions;
 
 import org.bukkit.Material;
-import ru.mcfine.mycolony.mycolony.MyColony;
 import ru.mcfine.mycolony.mycolony.config.MyConfig;
 
 import java.util.HashSet;

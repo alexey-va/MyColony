@@ -1,17 +1,15 @@
 package ru.mcfine.mycolony.mycolony.regions;
 
 import ru.mcfine.mycolony.mycolony.MyColony;
-import ru.mcfine.mycolony.mycolony.config.MyConfig;
 import ru.mcfine.mycolony.mycolony.regimes.Regime;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Set;
 
 public class UpgradeType {
 
     private String regionTypeName;
-    private String regimeName;
+    private final String regimeName;
     private RegionType regionType;
     private Regime regime;
     private List<UpgradeCondition> conditionList = new ArrayList<>();

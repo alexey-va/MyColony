@@ -5,17 +5,15 @@ import org.bukkit.Bukkit;
 import org.bukkit.Chunk;
 import org.bukkit.Location;
 
-import java.util.ArrayList;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Set;
 
 public class SquareArea extends CityArea{
 
-    private int chunkRadius;
+    private final int chunkRadius;
     private String worldName;
     private int x, y, z;
-    private Location center;
+    private final Location center;
     Set<Chunk> chunks = new HashSet<>();
     Set<BorderChunk> borderChunks = new HashSet<>();
 

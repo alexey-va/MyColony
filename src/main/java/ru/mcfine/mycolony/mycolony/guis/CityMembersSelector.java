@@ -9,10 +9,8 @@ import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
-import org.jetbrains.annotations.NotNull;
 import ru.mcfine.mycolony.mycolony.config.Lang;
 import ru.mcfine.mycolony.mycolony.regions.Region;
-import ru.mcfine.mycolony.mycolony.tasks.TickerRunnable;
 import ru.mcfine.mycolony.mycolony.util.Utils;
 
 public class CityMembersSelector extends ChestGui {
@@ -21,9 +19,7 @@ public class CityMembersSelector extends ChestGui {
 
 
         OutlinePane background = new OutlinePane(0, 0, 9, 3, Pane.Priority.LOWEST);
-        background.addItem(new GuiItem(Utils.getBackground(), event -> {
-            event.setCancelled(true);
-        }));
+        background.addItem(new GuiItem(Utils.getBackground(), event -> event.setCancelled(true)));
         background.setRepeat(true);
         this.addPane(background);
 

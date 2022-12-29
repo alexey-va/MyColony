@@ -5,14 +5,12 @@ import com.github.stefvanschie.inventoryframework.gui.type.ChestGui;
 import com.github.stefvanschie.inventoryframework.pane.OutlinePane;
 import com.github.stefvanschie.inventoryframework.pane.PaginatedPane;
 import com.github.stefvanschie.inventoryframework.pane.Pane;
-import net.kyori.adventure.text.Component;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 import ru.mcfine.mycolony.mycolony.MyColony;
 import ru.mcfine.mycolony.mycolony.config.Lang;
-import ru.mcfine.mycolony.mycolony.regions.RegionType;
 import ru.mcfine.mycolony.mycolony.shop.ShopGroup;
 import ru.mcfine.mycolony.mycolony.util.Utils;
 
@@ -21,8 +19,8 @@ import java.util.List;
 
 public class ShopMenu extends ChestGui {
 
-    private int rows = 3;
-    private List<GuiItem> guiItemList = new ArrayList<>();
+    private final int rows = 3;
+    private final List<GuiItem> guiItemList = new ArrayList<>();
 
     public ShopMenu(Player p) {
         super(3, Lang.getString("shop.title", p));
@@ -30,9 +28,7 @@ public class ShopMenu extends ChestGui {
 
         OutlinePane background = new OutlinePane(0,0,9,rows, Pane.Priority.LOWEST);
         background.setRepeat(true);
-        background.addItem(new GuiItem(Utils.getBackground(), event -> {
-            event.setCancelled(true);
-        }));
+        background.addItem(new GuiItem(Utils.getBackground(), event -> event.setCancelled(true)));
         this.addPane(background);
 
         if(rows - 2 > 0) {

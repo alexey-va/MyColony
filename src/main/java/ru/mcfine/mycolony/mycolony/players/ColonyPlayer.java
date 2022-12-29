@@ -8,8 +8,8 @@ import java.util.List;
 
 public class ColonyPlayer {
 
-    private String playerName;
-    private String uuid;
+    private final String playerName;
+    private final String uuid;
     private List<Region> regions = new ArrayList<>();
 
     public ColonyPlayer(String playerName, String uuid, List<Region> regions) {

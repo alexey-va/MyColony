@@ -1,20 +1,22 @@
 package ru.mcfine.mycolony.mycolony.regimes;
 
 import org.bukkit.Material;
-import ru.mcfine.mycolony.mycolony.regions.Region;
+import ru.mcfine.mycolony.mycolony.config.Lang;
+import ru.mcfine.mycolony.mycolony.regions.UpgradeType;
 
 import java.util.ArrayList;
+import java.util.List;
 
 public class Regime {
 
     private Material icon = Material.BEDROCK;
     private String displayName = "Null";
-    private ArrayList<RegimeBuff> regimeBuffs;
-    private ArrayList<RegimeTransition> regimeTransitions;
+    private final List<RegimeBuff> regimeBuffs;
+    private final List<UpgradeType> regimeTransitions;
 
-    public Regime(Material icon, String displayName, ArrayList<RegimeBuff> regimeBuffs, ArrayList<RegimeTransition> regimeTransitions) {
+    public Regime(Material icon, String displayName, List<RegimeBuff> regimeBuffs, List<UpgradeType> regimeTransitions) {
         this.icon = icon;
-        this.displayName = displayName;
+        this.displayName = Lang.translate(displayName);
         this.regimeBuffs = regimeBuffs;
         this.regimeTransitions = regimeTransitions;
     }
@@ -27,11 +29,11 @@ public class Regime {
         return displayName;
     }
 
-    public ArrayList<RegimeBuff> getRegimeBuffs() {
+    public List<RegimeBuff> getRegimeBuffs() {
         return regimeBuffs;
     }
 
-    public ArrayList<RegimeTransition> getRegimeTransitions() {
+    public List<UpgradeType> getRegimeTransitions() {
         return regimeTransitions;
     }
 }

@@ -28,12 +28,13 @@ public class RegionType {
     private Material shopIcon = Material.BEDROCK;
     private double price = 1000;
     private String displayName = "No_name";
-    private String regionId;
+    private final String regionId;
     private boolean enabled = true;
     private List<Requirement> reqs;
-    private String shopGroup;
-    private int shopAmount;
-    private List<UpgradeType> upgradeTypes = new ArrayList<>();
+    private final String shopGroup;
+    private final int shopAmount;
+    private List<String> groupNames;
+    private final List<UpgradeType> upgradeTypes = new ArrayList<>();
 
 
 
@@ -41,7 +42,7 @@ public class RegionType {
     private boolean absolutePower=false;
 
 
-    public RegionType(List<ProductionEntry> productionEntries, int level, int cityLevelForUpgrade, double income,
+    public RegionType(List<String> groupNames, List<ProductionEntry> productionEntries, int level, int cityLevelForUpgrade, double income,
                       ArrayList<RegionType> upgrades, ArrayList<BuildingMaterial> buildingMaterials, int xRight, int xLeft,
                       int zBackward, int zForward, int yDown, int yUp, boolean isCity, Material dynmapMarker,
                       Material shopIcon, double price, String displayName, boolean enabled, List<Requirement> reqs, String shopGroup, int shopAmount, String regionId) {
@@ -50,6 +51,7 @@ public class RegionType {
                 sorted(Comparator.comparingInt(ProductionEntry::getPriority)).collect(Collectors.toList());
         else this.productionEntries = null;
 
+        this.groupNames = groupNames;
         this.level = level;
         this.cityLevelForUpgrade = cityLevelForUpgrade;
         this.income = income;
@@ -73,7 +75,7 @@ public class RegionType {
         this.regionId = regionId;
     }
 
-    public RegionType(List<ProductionEntry> productionEntries, int level, int cityLevelForUpgrade, double income,
+    public RegionType(List<String> groupNames, List<ProductionEntry> productionEntries, int level, int cityLevelForUpgrade, double income,
                       ArrayList<RegionType> upgrades, ArrayList<BuildingMaterial> buildingMaterials, int xRight, int xLeft,
                       int zBackward, int zForward, int yDown, int yUp, boolean isCity, Material dynmapMarker,
                       Material shopIcon, double price, String displayName, boolean enabled, List<Requirement> reqs, String shopGroup,
@@ -83,6 +85,7 @@ public class RegionType {
                 sorted(Comparator.comparingInt(ProductionEntry::getPriority)).collect(Collectors.toList());
         else this.productionEntries = null;
 
+        this.groupNames = groupNames;
         this.level = level;
         this.cityLevelForUpgrade = cityLevelForUpgrade;
         this.income = income;

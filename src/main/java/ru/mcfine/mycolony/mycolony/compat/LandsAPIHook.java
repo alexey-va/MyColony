@@ -1,19 +1,14 @@
 package ru.mcfine.mycolony.mycolony.compat;
 
-import javafx.util.Pair;
-import me.angeschossen.lands.api.flags.types.PlayerFlag;
 import me.angeschossen.lands.api.flags.types.RoleFlag;
 import me.angeschossen.lands.api.integration.LandsIntegration;
 import me.angeschossen.lands.api.land.Area;
 import me.angeschossen.lands.api.land.Land;
 import org.bukkit.Location;
 import org.bukkit.Material;
-import org.bukkit.World;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import ru.mcfine.mycolony.mycolony.MyColony;
-import ru.mcfine.mycolony.mycolony.city.CityArea;
-import ru.mcfine.mycolony.mycolony.city.LandsArea;
 
 public class LandsAPIHook {
 

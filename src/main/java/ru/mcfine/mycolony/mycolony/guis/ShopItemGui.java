@@ -8,8 +8,6 @@ import com.github.stefvanschie.inventoryframework.pane.Pane;
 import com.github.stefvanschie.inventoryframework.pane.StaticPane;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
-import org.bukkit.inventory.ItemStack;
-import org.jetbrains.annotations.NotNull;
 import ru.mcfine.mycolony.mycolony.production.ProductionEntry;
 import ru.mcfine.mycolony.mycolony.regions.GroupItem;
 import ru.mcfine.mycolony.mycolony.regions.ProductionItem;
@@ -20,17 +18,15 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class ShopItemGui extends ChestGui {
-    private ShopGroupGui parentMenu;
-    private List<StaticPane> entriesPanes = new ArrayList<>();
-    private PaginatedPane prod;
-    private List<GroupItem> groupItems = new ArrayList<>();
+    private final ShopGroupGui parentMenu;
+    private final List<StaticPane> entriesPanes = new ArrayList<>();
+    private final PaginatedPane prod;
+    private final List<GroupItem> groupItems = new ArrayList<>();
     public ShopItemGui(RegionType regionType, ShopGroupGui parentMenu, Player p) {
         super(6, regionType.getDisplayName());
         this.parentMenu = parentMenu;
 
-        setOnClose(close -> {
-            Utils.getBackground(Material.GRAY_STAINED_GLASS_PANE);
-        });
+        setOnClose(close -> Utils.getBackground(Material.GRAY_STAINED_GLASS_PANE));
 
         OutlinePane background = new OutlinePane(0,0,9,6, Pane.Priority.LOWEST);
         background.addItem(new GuiItem(Utils.getBackground(), event -> event.setCancelled(true)));

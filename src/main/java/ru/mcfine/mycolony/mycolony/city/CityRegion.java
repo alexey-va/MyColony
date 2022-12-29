@@ -11,8 +11,8 @@ public class CityRegion extends Region {
     private CityArea cityArea;
     private Set<String> cityMembers = new HashSet<>();
     private int cityPopulation = 0;
-    private String cityWgName;
-    private String ownerName;
+    private final String cityWgName;
+    private final String ownerName;
 
 
     public CityRegion(Set<String> playerNames, int level, int x, int y, int z, String regionName, String worldName,
